@@ -9,11 +9,17 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class REVColorDistance {
 	private ColorSensor csen;
 	private DistanceSensor dsen;
+	private DistanceUnit dunit;
 
 	public REVColorDistance(OpMode opMode, String colorName, String distanceName) {
 		HardwareMap hw_map = opMode.hardwareMap;
 		csen = hw_map.get(ColorSensor.class, colorName);
 		dsen = hw_map.get(DistanceSensor.class, distanceName);
+	}
+
+	public REVColorDistance setUnit(DistanceUnit unit) {
+		dunit = unit;
+		return this;
 	}
 
 	public ColorSensor getColorSensor() {
@@ -23,7 +29,7 @@ public class REVColorDistance {
 		return dsen;
 	}
 
-	public double getDistance(DistanceUnit dunit) {
+	public double getDistance() {
 		return dsen.getDistance(dunit);
 	}
 
