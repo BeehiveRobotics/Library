@@ -37,4 +37,13 @@ public class REVIMU {
     public double getHeading() {
         return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
     }
+
+    public BNO055IMU.Parameters getParameters() { 
+    	return this.parameters;
+    }
+
+    public boolean getInitialized() {
+	    return isInitialized;
+    }
+
 }
