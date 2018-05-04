@@ -14,7 +14,7 @@ public class REVIMU {
     private BNO055IMU imu;
     private BNO055IMU.Parameters parameters;
     private boolean isInitialized = false;
-    public double heading;
+    private double heading;
     public REVIMU (OpMode opMode) {
         this.hardwareMap = opMode.hardwareMap;
         this.parameters = new BNO055IMU.Parameters();
