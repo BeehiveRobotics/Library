@@ -43,7 +43,12 @@ public class REVIMU {
     }
 
     public boolean getInitialized() {
-	    return isInitialized;
+	    return this.isInitialized;
     }
+
+    public BNO055IMU getIMU() {
+	    return this.imu;
+    }
+
 
 }
