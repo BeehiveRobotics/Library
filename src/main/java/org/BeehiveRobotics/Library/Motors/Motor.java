@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class Motor {
     private static final double RAMP_LOG_EXPO = 0.8;
     private DcMotor motor;
-    private MotorType model;
+    private MotorModel model;
     private String name;
     private LinearOpMode opMode;
     private double target;
@@ -23,8 +23,8 @@ public class Motor {
         return this;
     }
 
-    Motor setModel(MotorType motorType) {
-        this.model = motorType;
+    Motor setModel(MotorModel motorModel) {
+        this.model = motorModel;
         return this;
     }
 
@@ -90,4 +90,12 @@ public class Motor {
         return this.name;
     }
 
+    boolean isAtTarget() {
+        if (target < 0) {
+            return current <= target;
+        } else if (target > 0) {
+            return current >= target;
+        }
+        return true;
+    }
 }

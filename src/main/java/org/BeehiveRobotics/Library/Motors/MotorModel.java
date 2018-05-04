@@ -1,11 +1,11 @@
 package org.BeehiveRobotics.Library.Motors;
 
-public enum MotorType {
+public enum MotorModel {
     NEVEREST20, NEVEREST40, NEVEREST60;
     public double CPR;
     public double DEFAULT_CPR = 0;
-    public double CPR(MotorType motorType) {
-        switch (motorType){
+    public double CPR(MotorModel motorModel) {
+        switch (motorModel){
             case NEVEREST20:
                 return 537.6;
             case NEVEREST40:
@@ -17,8 +17,8 @@ public enum MotorType {
     }
     public int RPM;
     public int DEFAULT_RPM = 0;
-    public int RPM(MotorType motorType) {
-        switch (motorType) {
+    public int RPM(MotorModel motorModel) {
+        switch (motorModel) {
             case NEVEREST20:
                 return 340;
             case NEVEREST40:
