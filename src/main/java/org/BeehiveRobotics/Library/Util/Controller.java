@@ -72,4 +72,8 @@ public class Controller {
     public boolean y() {
         return gamepad.y;
     }
+
+    public Gamepad getGamepad() {
+        return gamepad;
+    }
 }

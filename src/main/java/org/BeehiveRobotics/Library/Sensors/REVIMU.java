@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.BeehiveRobotics.Library.Sensors;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -11,8 +11,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 public class REVIMU {
     private HardwareMap hardwareMap;
-    BNO055IMU imu;
-    BNO055IMU.Parameters parameters;
+    private BNO055IMU imu;
+    private BNO055IMU.Parameters parameters;
     private boolean isInitialized = false;
     public double heading;
     public REVIMU (OpMode opMode) {
