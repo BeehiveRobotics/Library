@@ -8,14 +8,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class REVColorDistance {
-<<<<<<< HEAD
-	private ColorSensor csen;
-	private DistanceSensor dsen;
 	private DistanceUnit dunit;
-=======
 	private ColorSensor colorSensor;
 	private DistanceSensor distanceSensor;
->>>>>>> 83df944289f7893a362304b82c4d3b5fdcafc40c
 
 	public REVColorDistance(LinearOpMode opMode, String colorName, String distanceName) {
 		HardwareMap hardwareMap = opMode.hardwareMap;
@@ -35,13 +30,8 @@ public class REVColorDistance {
 		return distanceSensor;
 	}
 
-<<<<<<< HEAD
 	public double getDistance() {
 		return dsen.getDistance(dunit);
-=======
-	public double getDistance(DistanceUnit distanceUnit) {
-		return distanceSensor.getDistance(distanceUnit);
->>>>>>> 83df944289f7893a362304b82c4d3b5fdcafc40c
 	}
 
 	public double getRed() {
