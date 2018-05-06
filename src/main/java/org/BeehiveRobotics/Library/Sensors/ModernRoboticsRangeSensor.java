@@ -5,18 +5,18 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class ModernRoboticsRange {
+public class ModernRoboticsRangeSensor {
 	private ModernRoboticsI2cRangeSensor rangeSensor;
 	private DistanceUnit units;
 
-	public ModernRoboticsRange(LinearOpMode opMode, String rangeName) {
-		//units in this will automatically default to cm
-		units = DistanceUnit.cm;
+	public ModernRoboticsRangeSensor(LinearOpMode opMode, String rangeName) {
+		//units in this will automatically default to inches
+		units = DistanceUnit.INCH;
 		HardwareMap hwMap = opMode.hardwareMap;
 		rangeSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, rangeName);
 	}
 
-	public ModernRoboticsRange setUnit(DistanceUnit unit) {
+	public ModernRoboticsRangeSensor setUnit(DistanceUnit unit) {
 		units = unit;
 		return this;
 	}

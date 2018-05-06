@@ -1,19 +1,13 @@
 package org.BeehiveRobotics.Library.Sensors;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.vuforia.CameraDevice;
-import com.firstinspires.ftc.robotcore.internal.vuforia.VuforiaLocalizerImpl;
-import java.lang.Exception;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.internal.vuforia.VuforiaLocalizerImpl;
 
 public class VuforiaCamera {
-	//I don't believe in calling this class "Phone"
-	//You shouldn't either.
-	
 	public class ClosableVuforiaLocalizer extends VuforiaLocalizerImpl {
 		private boolean closed = false;
 		
-		public ClosableVuforiaLocalizer(Parameters parameters) {
+		public ClosableVuforiaLocalizer(VuforiaLocalizer.Parameters parameters) {
 			super(parameters);
 		}
 

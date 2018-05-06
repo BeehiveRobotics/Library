@@ -48,6 +48,10 @@ public class Motor {
         this.target = target;
     }
 
+    void setRawPower(double power) {
+        this.motor.setPower(power);
+    }
+
     void setPower(double power) {
         if (!(this.opMode.opModeIsActive()) || power == 0) {
             stopMotor();
@@ -63,11 +67,14 @@ public class Motor {
         }
         this.motor.setPower(expo_speed);
     }
+
     void setPower(double power, double current, double target) {
         if (!(this.opMode.opModeIsActive()) || power == 0) {
             stopMotor();
             return;
         }
+        this.current = current;
+        this.target = target;
         double k = 4 / target;
         double calculated_power = k * this.current * (1 - current / target) * power;
         double expo_speed = Math.pow(Math.abs(calculated_power), RAMP_LOG_EXPO);
@@ -82,11 +89,11 @@ public class Motor {
         this.motor.setPower(0);
     }
 
-    private DcMotor.RunMode getRunMode() {
+    DcMotor.RunMode getRunMode() {
         return this.motor.getMode();
     }
 
-    private String getName() {
+    String getName() {
         return this.name;
     }
 
