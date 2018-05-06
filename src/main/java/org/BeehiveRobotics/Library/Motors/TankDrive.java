@@ -98,8 +98,6 @@ public class TankDrive {
         RearLeft.setRawPower(rl);
         RearRight.setRawPower(rr);
     }
-
-
     /*
     This method is used to set the target variables for each of the motors
      */
@@ -133,10 +131,45 @@ public class TankDrive {
         stopMotors();
     }
 
+    /*
+    Stops the motors
+     */
     private void stopMotors() {
         FrontLeft.stopMotor();
         FrontRight.stopMotor();
         RearLeft.stopMotor();
         RearRight.stopMotor();
+    }
+    public void forward(double speed, double inches) {
+        speed = Math.abs(speed);
+        drive(speed, speed, inches);
+    }
+    public void backward(double speed, double inches) {
+        speed = -Math.abs(speed);
+        drive(speed, speed, inches);
+    }
+    public void spinRight(double speed, double inches) {
+        speed = Math.abs(speed);
+        drive(speed, -speed, inches);
+    }
+    public void spinLeft(double speed, double inches) {
+        speed = -Math.abs(speed);
+        drive(speed, -speed, inches);
+    }
+    public void leftForward(double speed, double inches) {
+        speed = Math.abs(speed);
+        drive(speed,  0, inches);
+    }
+    public void leftBackward(double speed, double inches) {
+        speed = -Math.abs(speed);
+        drive(speed, 0, inches);
+    }
+    public void rightForward(double speed, double inches) {
+        speed = Math.abs(speed);
+        drive(0, speed, inches);
+    }
+    public void rightBackward(double speed, double inches) {
+        speed = -Math.abs(speed);
+        drive(0, speed, inches);
     }
 }
