@@ -98,6 +98,7 @@ public class TankDrive {
         RearLeft.setRawPower(rl);
         RearRight.setRawPower(rr);
     }
+
     /*
     This method is used to set the target variables for each of the motors
      */
@@ -125,10 +126,14 @@ public class TankDrive {
         double clicks = inches_to_clicks(inches);
         setTarget(clicks);
         setPowers(leftSpeed, rightSpeed, leftSpeed, rightSpeed);
-        while(!(FrontLeft.isAtTarget() && FrontRight.isAtTarget() && RearLeft.isAtTarget() && RearRight.isAtTarget())) {
+        while (!(FrontLeft.isAtTarget() && FrontRight.isAtTarget() && RearLeft.isAtTarget() && RearRight.isAtTarget())) {
             setPowers(leftSpeed, rightSpeed, leftSpeed, rightSpeed);
         }
         stopMotors();
+    }
+
+    private void drive(double leftSpeed, double rightSpeed) {
+        setRawPowers(leftSpeed, rightSpeed, leftSpeed, rightSpeed);
     }
 
     /*
@@ -140,36 +145,85 @@ public class TankDrive {
         RearLeft.stopMotor();
         RearRight.stopMotor();
     }
+
     public void forward(double speed, double inches) {
         speed = Math.abs(speed);
         drive(speed, speed, inches);
     }
+
     public void backward(double speed, double inches) {
         speed = -Math.abs(speed);
         drive(speed, speed, inches);
     }
+
     public void spinRight(double speed, double inches) {
         speed = Math.abs(speed);
         drive(speed, -speed, inches);
     }
+
     public void spinLeft(double speed, double inches) {
         speed = -Math.abs(speed);
         drive(speed, -speed, inches);
     }
+
     public void leftForward(double speed, double inches) {
         speed = Math.abs(speed);
-        drive(speed,  0, inches);
+        drive(speed, 0, inches);
     }
+
     public void leftBackward(double speed, double inches) {
         speed = -Math.abs(speed);
         drive(speed, 0, inches);
     }
+
     public void rightForward(double speed, double inches) {
         speed = Math.abs(speed);
         drive(0, speed, inches);
     }
+
     public void rightBackward(double speed, double inches) {
         speed = -Math.abs(speed);
         drive(0, speed, inches);
     }
+    
+    public void forward(double speed) {
+        speed = Math.abs(speed);
+        drive(speed, speed);
+    }
+
+    public void backward(double speed) {
+        speed = -Math.abs(speed);
+        drive(speed, speed);
+    }
+
+    public void spinRight(double speed) {
+        speed = Math.abs(speed);
+        drive(speed, -speed);
+    }
+
+    public void spinLeft(double speed) {
+        speed = -Math.abs(speed);
+        drive(speed, -speed);
+    }
+
+    public void leftForward(double speed) {
+        speed = Math.abs(speed);
+        drive(speed, 0);
+    }
+
+    public void leftBackward(double speed) {
+        speed = -Math.abs(speed);
+        drive(speed, 0);
+    }
+
+    public void rightForward(double speed) {
+        speed = Math.abs(speed);
+        drive(0, speed);
+    }
+
+    public void rightBackward(double speed) {
+        speed = -Math.abs(speed);
+        drive(0, speed);
+    }
+
 }

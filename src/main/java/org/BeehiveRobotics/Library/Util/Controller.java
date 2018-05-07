@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 public class Controller {
     private Gamepad gamepad;
     private boolean aPrev = false, bPrev = false, xPrev = false, yPrev = false, leftBumperPrev = false, rightBumperPrev = false, dpad_upPrev = false, dpad_downPrev = false, dpad_leftPrev = false, dpad_rightPrev = false;
-    public Controller(Gamepad gamepad) {
+    Controller(Gamepad gamepad) {
         this.gamepad = gamepad;
     }
 
