@@ -2,7 +2,10 @@ package org.BeehiveRobotics.Library.Util;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-public abstract class BROpMode extends LinearOpMode{
+public abstract class BROpMode extends LinearOpMode {
+    public enum OpModeType {
+        Autonomous, TeleOp
+    }
     private OpModeType opModeType;
     public abstract void initialize();
     public abstract void run();
