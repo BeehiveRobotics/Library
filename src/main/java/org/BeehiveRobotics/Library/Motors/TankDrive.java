@@ -185,7 +185,7 @@ public class TankDrive {
         speed = -Math.abs(speed);
         drive(0, speed, inches);
     }
-    
+
     public void forward(double speed) {
         speed = Math.abs(speed);
         drive(speed, speed);
