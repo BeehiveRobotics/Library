@@ -2,6 +2,7 @@ package org.BeehiveRobotics.Library.Motors;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class Motor {
     private static final double RAMP_LOG_EXPO = 0.8;
@@ -104,5 +105,9 @@ public class Motor {
             return current >= target;
         }
         return true;
+    }
+
+    public void setDirection(DcMotorSimple.Direction direction) {
+        this.motor.setDirection(direction);
     }
 }

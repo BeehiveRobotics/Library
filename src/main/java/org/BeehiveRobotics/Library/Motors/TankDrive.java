@@ -1,10 +1,14 @@
 package org.BeehiveRobotics.Library.Motors;
 
+import android.os.NetworkOnMainThreadException;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class TankDrive {
     private final LinearOpMode opMode;
+    private GearedType gearedType;
     private Motor FrontLeft;
     private Motor FrontRight;
     private Motor RearLeft;
@@ -15,14 +19,30 @@ public class TankDrive {
     private MotorModel model; //Which model of motor is being used
     private double target; //target for the motors to move to (in clicks)
 
+    public enum GearedType {NORMAL, REVERSED}
+
     public TankDrive(LinearOpMode linearOpMode) {
+        this(linearOpMode, GearedType.NORMAL);
+    }
+
+    public TankDrive(LinearOpMode linearOpMode, GearedType gearedType) {
         this.opMode = linearOpMode;
+        this.gearedType = gearedType;
     }
     public void mapHardware() {
         FrontLeft = new Motor(opMode, "fl");
         FrontRight = new Motor(opMode, "fr");
         RearLeft = new Motor(opMode, "rl");
         RearRight = new Motor(opMode, "rr");
+        if(gearedType == GearedType.NORMAL) {
+            FrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+            RearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+            FrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+            RearRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        } else {
+            FrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+            RearRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         resetEncoders();
@@ -62,6 +82,14 @@ public class TankDrive {
         RearRight.setRunMode(runMode);
     }
 
+    public GearedType getGearedType() {
+        return gearedType;
+    }
+
+    public void setGearedType(GearedType gearedType) {
+        this.gearedType = gearedType;
+    }
+
     /*
     Returns which model of motor is being used
      */
@@ -77,8 +105,9 @@ public class TankDrive {
         FrontRight.setModel(model);
         RearLeft.setModel(model);
         RearRight.setModel(model);
-        RPM = model.RPM;
-        CPR = model.CPR;
+        this.model = model;
+        this.RPM = model.RPM;
+        this.CPR = model.CPR;
     }
 
     /*
