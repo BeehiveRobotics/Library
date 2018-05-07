@@ -6,9 +6,10 @@ public abstract class BROpMode extends LinearOpMode {
     public enum OpModeType {
         Autonomous, TeleOp
     }
-    private OpModeType opModeType;
+    public OpModeType opModeType;
     public abstract void initialize();
     public abstract void run();
+    public abstract void end();
     public final void setOpModeType(OpModeType opModeType){
         this.opModeType = opModeType;
     }
@@ -31,5 +32,4 @@ public abstract class BROpMode extends LinearOpMode {
             end();
         }
     }
-    public void end() {}
 }

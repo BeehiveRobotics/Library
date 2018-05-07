@@ -5,10 +5,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class TankDrive {
     private final LinearOpMode opMode;
-    private final Motor FrontLeft;
-    private final Motor FrontRight;
-    private final Motor RearLeft;
-    private final Motor RearRight;
+    private Motor FrontLeft;
+    private Motor FrontRight;
+    private Motor RearLeft;
+    private Motor RearRight;
     private double CPR; //Clicks per rotation of each motor
     private double RPM; //Rotations per Minute of each motor
     private double WD;  //Wheel diameter
@@ -17,6 +17,8 @@ public class TankDrive {
 
     public TankDrive(LinearOpMode linearOpMode) {
         this.opMode = linearOpMode;
+    }
+    public void mapHardware() {
         FrontLeft = new Motor(opMode, "fl");
         FrontRight = new Motor(opMode, "fr");
         RearLeft = new Motor(opMode, "rl");
@@ -132,14 +134,14 @@ public class TankDrive {
         stopMotors();
     }
 
-    private void drive(double leftSpeed, double rightSpeed) {
+    public void drive(double leftSpeed, double rightSpeed) {
         setRawPowers(leftSpeed, rightSpeed, leftSpeed, rightSpeed);
     }
 
     /*
     Stops the motors
      */
-    private void stopMotors() {
+    public void stopMotors() {
         FrontLeft.stopMotor();
         FrontRight.stopMotor();
         RearLeft.stopMotor();
