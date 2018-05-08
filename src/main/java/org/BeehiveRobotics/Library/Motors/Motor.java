@@ -3,9 +3,12 @@ package org.BeehiveRobotics.Library.Motors;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.Range;
 
 public class Motor {
     private static final double RAMP_LOG_EXPO = 0.8;
+    private double MIN_SPEED = 0.2;
+    private double MAX_SPEED = 1;
     private DcMotor motor;
     private MotorModel model;
     private String name;
@@ -26,6 +29,16 @@ public class Motor {
 
     Motor setModel(MotorModel motorModel) {
         this.model = motorModel;
+        return this;
+    }
+
+    Motor setMinSpeed(double speed) {
+        this.MIN_SPEED = Math.abs(speed);
+        return this;
+    }
+
+    public Motor setMaxSpeed(double speed) {
+        this.MAX_SPEED = Math.abs(speed);
         return this;
     }
 
@@ -50,7 +63,17 @@ public class Motor {
     }
 
     void setRawPower(double power) {
-        this.motor.setPower(power);
+        if (opMode.opModeIsActive()) {
+            if (power > 0) {
+                this.motor.setPower(Range.clip(power, MIN_SPEED, MAX_SPEED));
+            } else if (power < 0) {
+                this.motor.setPower(Range.clip(power, -MAX_SPEED, -MIN_SPEED));
+            } else {
+                stopMotor();
+            }
+        } else {
+            stopMotor();
+        }
     }
 
     void setPower(double power) {
@@ -60,13 +83,13 @@ public class Motor {
         }
         this.current = getCurrentPosition();
         double k = 4 / target;
-        double calculated_power = k * this.current * (1 - current / target) * power;
+        double calculated_power = k * this.current * (1 - current / target) * power + 0.001;
         double expo_speed = Math.pow(Math.abs(calculated_power), RAMP_LOG_EXPO);
         if (power < 0) {
-            this.motor.setPower(-expo_speed);
+            setRawPower(-expo_speed);
             return;
         }
-        this.motor.setPower(expo_speed);
+        setRawPower(expo_speed);
     }
 
     void setPower(double power, double current, double target) {
@@ -80,10 +103,10 @@ public class Motor {
         double calculated_power = k * this.current * (1 - current / target) * power;
         double expo_speed = Math.pow(Math.abs(calculated_power), RAMP_LOG_EXPO);
         if (power < 0) {
-            this.motor.setPower(-expo_speed);
+            setRawPower(-expo_speed);
             return;
         }
-        this.motor.setPower(expo_speed);
+        setRawPower(expo_speed);
     }
 
     void stopMotor() {
@@ -99,12 +122,15 @@ public class Motor {
     }
 
     boolean isAtTarget() {
+        return Math.abs(current) >= Math.abs(target);
+        /*
         if (target < 0) {
             return current <= target;
         } else if (target > 0) {
             return current >= target;
         }
         return true;
+        */
     }
 
     public void setDirection(DcMotorSimple.Direction direction) {

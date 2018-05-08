@@ -13,6 +13,10 @@ public abstract class BROpMode extends LinearOpMode {
     public final void setOpModeType(OpModeType opModeType){
         this.opModeType = opModeType;
     }
+    public final void showLine(String line) {
+        telemetry.addLine(line);
+        telemetry.update();
+    }
     protected Controller controller1, controller2;
     public final void runOpMode() throws InterruptedException {
         try {

@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import java.util.MissingFormatArgumentException;
+
 public class TankDrive {
     private final LinearOpMode opMode;
     private GearedType gearedType;
@@ -18,6 +20,24 @@ public class TankDrive {
     private double WD;  //Wheel diameter
     private MotorModel model; //Which model of motor is being used
     private double target; //target for the motors to move to (in clicks)
+    private double MIN_SPEED = 0.25;
+    private double MAX_SPEED = 1;
+
+    public void setMinSpeed(double speed) {
+        this.MIN_SPEED = speed;
+        FrontLeft.setMinSpeed(MIN_SPEED);
+        FrontRight.setMinSpeed(MIN_SPEED);
+        RearLeft.setMinSpeed(MIN_SPEED);
+        RearRight.setMinSpeed(MIN_SPEED);
+    }
+
+    public void setMaxSpeed(double speed) {
+        this.MAX_SPEED = speed;
+        FrontLeft.setMaxSpeed(MAX_SPEED);
+        FrontRight.setMaxSpeed(MAX_SPEED);
+        RearLeft.setMaxSpeed(MAX_SPEED);
+        RearRight.setMaxSpeed(MAX_SPEED);
+    }
 
     public enum GearedType {NORMAL, REVERSED}
 
@@ -42,14 +62,15 @@ public class TankDrive {
         } else {
             FrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
             RearRight.setDirection(DcMotorSimple.Direction.REVERSE);
+            FrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+            RearLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         }
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         resetEncoders();
         setModel(MotorModel.NEVEREST40);
-        CPR = getModel().CPR;
-        RPM = getModel().RPM;
         WD = 3.937;
+        setMinSpeed(MIN_SPEED);
     }
 
     /*
@@ -106,8 +127,8 @@ public class TankDrive {
         RearLeft.setModel(model);
         RearRight.setModel(model);
         this.model = model;
-        this.RPM = model.RPM;
-        this.CPR = model.CPR;
+        this.RPM = MotorModel.RPM(model);
+        this.CPR = MotorModel.CPR(model);
     }
 
     /*
@@ -146,9 +167,8 @@ public class TankDrive {
      */
     private double inches_to_clicks(double inches) {
         double circumference = WD * Math.PI;
-        return CPR / circumference;
+        return CPR / circumference * inches;
     }
-
     /*
     Method to drive. Takes in speed of the left side, speed of the right, and the inches to move
      */
