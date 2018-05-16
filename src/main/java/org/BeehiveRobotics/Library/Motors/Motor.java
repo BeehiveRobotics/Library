@@ -59,7 +59,7 @@ public class Motor {
     }
 
     void setTarget(double target) {
-        this.target = target;
+        this.target = Math.abs(target);
     }
 
     void setRawPower(double power) {
@@ -83,7 +83,7 @@ public class Motor {
         }
         this.current = getCurrentPosition();
         double k = 4 / target;
-        double calculated_power = k * this.current * (1 - current / target) * power + 0.001;
+        double calculated_power = k * this.current * (1 - current / target) * power + Double.MIN_VALUE;
         double expo_speed = Math.pow(Math.abs(calculated_power), RAMP_LOG_EXPO);
         if (power < 0) {
             setRawPower(-expo_speed);
@@ -123,17 +123,11 @@ public class Motor {
 
     boolean isAtTarget() {
         return Math.abs(current) >= Math.abs(target);
-        /*
-        if (target < 0) {
-            return current <= target;
-        } else if (target > 0) {
-            return current >= target;
-        }
-        return true;
-        */
     }
 
-    public void setDirection(DcMotorSimple.Direction direction) {
+    public Motor setDirection(DcMotorSimple.Direction direction) {
         this.motor.setDirection(direction);
+        return this;
+
     }
 }

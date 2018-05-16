@@ -1,14 +1,10 @@
 package org.BeehiveRobotics.Library.Motors;
 
-import android.os.NetworkOnMainThreadException;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import java.util.MissingFormatArgumentException;
-
-public class TankDrive {
+public class TankDrive implements Runnable {
     private final LinearOpMode opMode;
     private GearedType gearedType;
     private Motor FrontLeft;
@@ -22,6 +18,9 @@ public class TankDrive {
     private double target; //target for the motors to move to (in clicks)
     private double MIN_SPEED = 0.25;
     private double MAX_SPEED = 1;
+    private double leftSpeed;
+    private double rightSpeed;
+    private static boolean isBusy = false;
 
     public void setMinSpeed(double speed) {
         this.MIN_SPEED = speed;
@@ -173,14 +172,15 @@ public class TankDrive {
     Method to drive. Takes in speed of the left side, speed of the right, and the inches to move
      */
     private void drive(double leftSpeed, double rightSpeed, double inches) {
+        this.leftSpeed = leftSpeed;
+        this.rightSpeed = rightSpeed;
         resetEncoders();
         double clicks = inches_to_clicks(inches);
         setTarget(clicks);
         setPowers(leftSpeed, rightSpeed, leftSpeed, rightSpeed);
-        while (!(FrontLeft.isAtTarget() && FrontRight.isAtTarget() && RearLeft.isAtTarget() && RearRight.isAtTarget())) {
-            setPowers(leftSpeed, rightSpeed, leftSpeed, rightSpeed);
-        }
-        stopMotors();
+        Thread thread = new Thread(this);
+        isBusy = true;
+        thread.start();
     }
 
     public void drive(double leftSpeed, double rightSpeed) {
@@ -277,4 +277,21 @@ public class TankDrive {
         drive(0, speed);
     }
 
+    public void run() {
+        while (!(FrontLeft.isAtTarget() && FrontRight.isAtTarget() && RearLeft.isAtTarget() && RearRight.isAtTarget())) {
+            setPowers(leftSpeed, rightSpeed, leftSpeed, rightSpeed);
+            if (!opMode.opModeIsActive()) {
+                stopMotors();
+                isBusy = false;
+                Thread.currentThread().interrupt();
+            }
+        }
+        stopMotors();
+        isBusy = false;
+        Thread.currentThread().interrupt();
+    }
+
+    public static boolean isBusy() {
+        return isBusy;
+    }
 }
