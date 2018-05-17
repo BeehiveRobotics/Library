@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
-import java.util.Runnable;
+import java.lang.Runnable;
 
 public class Motor implements Runnable {
     private static final double RAMP_LOG_EXPO = 0.8;
