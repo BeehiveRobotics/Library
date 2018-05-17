@@ -172,15 +172,29 @@ public class TankDrive implements Runnable {
     Method to drive. Takes in speed of the left side, speed of the right, and the inches to move
      */
     private void drive(double leftSpeed, double rightSpeed, double inches) {
+        this.drive(leftSpeed, rightSpeed, inches, true);
+    }
+    
+    private void drive(double leftSpeed, double rightSpeed, double inches, boolean waitForCompletion) {
         this.leftSpeed = leftSpeed;
         this.rightSpeed = rightSpeed;
         resetEncoders();
         double clicks = inches_to_clicks(inches);
-        setTarget(clicks);
-        setPowers(leftSpeed, rightSpeed, leftSpeed, rightSpeed);
-        Thread thread = new Thread(this);
-        isBusy = true;
-        thread.start();
+        setTargets(clicks);
+        if(waitForCompletion) {
+            while (!(FrontLeft.isAtTarget() && FrontRight.isAtTarget() && RearLeft.isAtTarget() && RearRight.isAtTarget())) {
+               setPowers(leftSpeed, rightSpeed, leftSpeed, rightSpeed);
+                if (!opMode.opModeIsActive()) {
+                    stopMotors();
+                    isBusy = false;
+                }
+            }
+        } else {   
+            Thread thread = new Thread(this);
+            thread.start();
+        }
+        stopMotors();
+        isBusy = false;
     }
 
     public void drive(double leftSpeed, double rightSpeed) {
@@ -278,17 +292,14 @@ public class TankDrive implements Runnable {
     }
 
     public void run() {
-        while (!(FrontLeft.isAtTarget() && FrontRight.isAtTarget() && RearLeft.isAtTarget() && RearRight.isAtTarget())) {
-            setPowers(leftSpeed, rightSpeed, leftSpeed, rightSpeed);
-            if (!opMode.opModeIsActive()) {
-                stopMotors();
-                isBusy = false;
-                Thread.currentThread().interrupt();
-            }
-        }
-        stopMotors();
-        isBusy = false;
-        Thread.currentThread().interrupt();
+        Thread flThread = new Thread(FrontLeft);
+        Thread frThread = new Thread(FrontRight);
+        Thread rlThread = new Thread(RearLeft);
+        Thread rrThread = new Thread(RearRight);
+        flThread.start();
+        frThread.start();
+        rlThread.start();
+        rrThread.start();
     }
 
     public static boolean isBusy() {
