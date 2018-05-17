@@ -4,8 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
+import java.util.Runnable;
 
-public class Motor {
+public class Motor implements Runnable {
     private static final double RAMP_LOG_EXPO = 0.8;
     private double MIN_SPEED = 0.2;
     private double MAX_SPEED = 1;
@@ -15,6 +16,7 @@ public class Motor {
     private LinearOpMode opMode;
     private double target;
     private double current;
+    private double power;
 
     Motor(LinearOpMode opMode, String name) {
         this.name = name;
@@ -61,6 +63,23 @@ public class Motor {
     void setTarget(double target) {
         this.target = Math.abs(target);
     }
+    
+    void runToTarget(double target, double power, boolean waitForStop) {
+        this.target = Math.abs(target);
+        this.power = power;
+        if(!waitForStop) {
+            Thread thread = new Thread(this);
+            thread.start();
+        } else {
+            while(!this.isAtTarget()) {
+                setPower(power);
+            }
+        }
+    }
+    
+    void runToTarget(double target, double power) {
+        this.runToTarget(target, power, true);
+    }
 
     void setRawPower(double power) {
         if (opMode.opModeIsActive()) {
@@ -77,6 +96,7 @@ public class Motor {
     }
 
     void setPower(double power) {
+        this.power = power;
         if (!(this.opMode.opModeIsActive()) || power == 0) {
             stopMotor();
             return;
@@ -93,6 +113,7 @@ public class Motor {
     }
 
     void setPower(double power, double current, double target) {
+        this.power = power;
         if (!(this.opMode.opModeIsActive()) || power == 0) {
             stopMotor();
             return;
@@ -100,7 +121,7 @@ public class Motor {
         this.current = current;
         this.target = target;
         double k = 4 / target;
-        double calculated_power = k * this.current * (1 - current / target) * power;
+        double calculated_power = k * this.current * (1 - current / target) * power + Double.MIN_VALUE;
         double expo_speed = Math.pow(Math.abs(calculated_power), RAMP_LOG_EXPO);
         if (power < 0) {
             setRawPower(-expo_speed);
@@ -129,5 +150,13 @@ public class Motor {
         this.motor.setDirection(direction);
         return this;
 
+    }
+    
+    public void run() {
+        while(!this.isAtTarget() && this.opModeIsActive()) {
+            this.setPower(this.power);
+        }
+        stopMotor();
+        Thread.currentThread().interrupt();
     }
 }
