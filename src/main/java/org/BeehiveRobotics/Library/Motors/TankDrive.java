@@ -74,7 +74,7 @@ public class TankDrive implements Runnable {
 
     /*
     A way to reset the encoders of each motor
-     */
+    */
     private void resetEncoders() {
         FrontLeft.resetEncoder();
         FrontRight.resetEncoder();
@@ -84,7 +84,7 @@ public class TankDrive implements Runnable {
 
     /*
     Quick way to set float or brake for each motor
-     */
+*/
     private void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior zeroPowerBehavior) {
         FrontLeft.setZeroPowerBehavior(zeroPowerBehavior);
         FrontRight.setZeroPowerBehavior(zeroPowerBehavior);
@@ -94,7 +94,7 @@ public class TankDrive implements Runnable {
 
     /*
     Quick way to set RunModes of each motor.
-     */
+*/
     private void setRunMode(DcMotor.RunMode runMode) {
         FrontLeft.setRunMode(runMode);
         FrontRight.setRunMode(runMode);
@@ -112,14 +112,14 @@ public class TankDrive implements Runnable {
 
     /*
     Returns which model of motor is being used
-     */
+*/
     private MotorModel getModel() {
         return model;
     }
 
     /*
     This is used to specify which model of motor is being used, so it can call things like clicks per rotation, and rotations per minute
-     */
+*/
     private void setModel(MotorModel model) {
         FrontLeft.setModel(model);
         FrontRight.setModel(model);
@@ -132,7 +132,7 @@ public class TankDrive implements Runnable {
 
     /*
     This method is used for updating powers of motors. It automatically ramps based on targets set in setTarget()
-     */
+*/
     private void setPowers(double fl, double fr, double rl, double rr) {
         FrontLeft.setPower(fl);
         FrontRight.setPower(fr);
@@ -142,7 +142,7 @@ public class TankDrive implements Runnable {
 
     /*
     This method is used for directly setting the power of the motors, such as for a TeleOp
-     */
+*/
     private void setRawPowers(double fl, double fr, double rl, double rr) {
         FrontLeft.setRawPower(fl);
         FrontRight.setRawPower(fr);
@@ -152,7 +152,7 @@ public class TankDrive implements Runnable {
 
     /*
     This method is used to set the target variables for each of the motors
-     */
+*/
     private void setTarget(double target) {
         FrontLeft.setTarget(target);
         FrontRight.setTarget(target);
@@ -163,14 +163,14 @@ public class TankDrive implements Runnable {
 
     /*
     This method is used to convert inches of movement to clicks of an encoder
-     */
+*/
     private double inches_to_clicks(double inches) {
         double circumference = WD * Math.PI;
         return CPR / circumference * inches;
     }
     /*
     Method to drive. Takes in speed of the left side, speed of the right, and the inches to move
-     */
+*/
     private void drive(double leftSpeed, double rightSpeed, double inches) {
         this.drive(leftSpeed, rightSpeed, inches, true);
     }
@@ -180,7 +180,7 @@ public class TankDrive implements Runnable {
         this.rightSpeed = rightSpeed;
         resetEncoders();
         double clicks = inches_to_clicks(inches);
-        setTargets(clicks);
+        setTarget(clicks);
         if(waitForCompletion) {
             while (!(FrontLeft.isAtTarget() && FrontRight.isAtTarget() && RearLeft.isAtTarget() && RearRight.isAtTarget())) {
                setPowers(leftSpeed, rightSpeed, leftSpeed, rightSpeed);
@@ -203,7 +203,7 @@ public class TankDrive implements Runnable {
 
     /*
     Stops the motors
-     */
+*/
     public void stopMotors() {
         FrontLeft.stopMotor();
         FrontRight.stopMotor();

@@ -153,10 +153,10 @@ public class Motor implements Runnable {
     }
     
     public void run() {
-        while(!this.isAtTarget() && this.opModeIsActive()) {
+        while(!this.isAtTarget() && this.opMode.opModeIsActive()) {
             this.setPower(this.power);
         }
-        stopMotor();
+        this.stopMotor();
         Thread.currentThread().interrupt();
     }
 }

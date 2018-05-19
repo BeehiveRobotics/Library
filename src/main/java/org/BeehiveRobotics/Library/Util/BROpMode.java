@@ -2,7 +2,7 @@ package org.BeehiveRobotics.Library.Util;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.BeehiveRobotics.Library.Motors.TankDrive;
+import org.BeehiveRobotics.Library.Motors.KTTankDrive;
 
 public abstract class BROpMode extends LinearOpMode {
     public enum OpModeType {
@@ -17,7 +17,7 @@ public abstract class BROpMode extends LinearOpMode {
 
     public abstract void end();
 
-    public final void setOpModeType(OpModeType opModeType) {
+    protected final void setOpModeType(OpModeType opModeType) {
         this.opModeType = opModeType;
     }
 
@@ -45,9 +45,5 @@ public abstract class BROpMode extends LinearOpMode {
         } finally {
             end();
         }
-    }
-
-    protected final void waitUntilNotBusy() {
-        while (TankDrive.isBusy()) {}
     }
 }
