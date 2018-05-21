@@ -1,4 +1,4 @@
-package org.BeehiveRobotics.Library.Motors
+package org.BeehiveRobotics.Library.Motors.Kotlin
 
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple

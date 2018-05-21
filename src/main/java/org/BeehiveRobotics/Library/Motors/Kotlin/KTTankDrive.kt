@@ -1,4 +1,4 @@
-package org.BeehiveRobotics.Library.Motors
+package org.BeehiveRobotics.Library.Motors.Kotlin
 
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple
@@ -15,7 +15,7 @@ class KTTankDrive(opMode: BROpMode, gearedType: GearedType) : Runnable {
     private val RearLeft: KTMotor = KTMotor(opMode, "rl")
     private val RearRight: KTMotor = KTMotor(opMode, "rr")
     private var CPR: Double = 0.toDouble() //Clicks per rotation of each motor
-    private var RPM: Double = 0.toDouble() //Rotations per Minute of each motor
+    private var RPM: Int = 0 //Rotations per Minute of each motor
     private var WD: Double = 0.toDouble()  //Wheel diameter
     private lateinit var model: MotorModel //Which model of motor is being used
     private var target: Double = 0.toDouble() //target for the motors to move to (in clicks)
@@ -127,8 +127,8 @@ class KTTankDrive(opMode: BROpMode, gearedType: GearedType) : Runnable {
         RearLeft.setModel(model)
         RearRight.setModel(model)
         this.model = model
-        this.RPM = MotorModel.RPM(model).toDouble()
-        this.CPR = MotorModel.CPR(model)
+        this.RPM = model.RPM
+        this.CPR = model.CPR
         return this
     }
 

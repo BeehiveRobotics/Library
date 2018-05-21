@@ -1,4 +1,4 @@
-package org.BeehiveRobotics.Library.Motors;
+package org.BeehiveRobotics.Library.Motors.Java;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;

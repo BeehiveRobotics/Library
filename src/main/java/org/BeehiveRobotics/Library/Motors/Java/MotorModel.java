@@ -1,4 +1,4 @@
-package org.BeehiveRobotics.Library.Motors;
+package org.BeehiveRobotics.Library.Motors.Java;
 
 public enum MotorModel {
     NEVEREST20, NEVEREST40, NEVEREST60;
