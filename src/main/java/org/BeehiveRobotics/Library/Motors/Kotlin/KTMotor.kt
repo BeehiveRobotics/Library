@@ -15,7 +15,7 @@ class KTMotor constructor(opMode: BROpMode, name: String) : Runnable {
     private var power: Double = 0.toDouble()
     private val name: String = name
     private val opMode : BROpMode = opMode
-    private val motor : DcMotor = opMode.hardwareMap.dcMotor.get(name)
+    private val motor : DcMotor = opMode.hardwareMap.get(DcMotor::class.java, name)
 
     internal fun setRunMode(runMode: DcMotor.RunMode): KTMotor {
         this.motor.mode = runMode
@@ -113,7 +113,7 @@ class KTMotor constructor(opMode: BROpMode, name: String) : Runnable {
         }
         this.current = current
         this.target = target
-        val k = 4 / target
+        val k: Double = 4 / target
         val calculated_power = k * this.current * (1 - current / target) * power + java.lang.Double.MIN_VALUE
         val expo_speed = Math.pow(Math.abs(calculated_power), RAMP_LOG_EXPO)
         if (power < 0) {
