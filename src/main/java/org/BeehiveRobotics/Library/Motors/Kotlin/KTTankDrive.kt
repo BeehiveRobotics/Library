@@ -10,7 +10,6 @@ import org.BeehiveRobotics.Library.Util.BROpMode
 class KTTankDrive(opMode: BROpMode, gearedType: GearedType) : Runnable {
     private val opMode: BROpMode = opMode
     private var gearedType: GearedType = gearedType
-    private val hardwareMap: HardwareMap = opMode.hardwareMap
     private lateinit var FrontLeft: KTMotor
     private lateinit var FrontRight: KTMotor
     private lateinit var RearLeft: KTMotor
@@ -59,7 +58,7 @@ class KTTankDrive(opMode: BROpMode, gearedType: GearedType) : Runnable {
         NORMAL, REVERSED
     }
 
-    constructor(opMode: BROpMode) : this(opMode, GearedType.NORMAL)
+    constructor(opMode: BROpMode): this(opMode, GearedType.NORMAL)
 
     fun init() {
         if (gearedType == GearedType.NORMAL) {
@@ -309,7 +308,10 @@ class KTTankDrive(opMode: BROpMode, gearedType: GearedType) : Runnable {
         var current: Int = heading
         var last: Int = heading
         while (current < target) {
-            while (derivative <= 180 && opMode.opModeIsActive()) {
+            while (derivative <= 180) {
+                if(!opMode.opModeIsActive()) {
+                    return
+                }
                 derivative = current - last
                 last = current
                 current = gyro.getHeading()
@@ -321,7 +323,10 @@ class KTTankDrive(opMode: BROpMode, gearedType: GearedType) : Runnable {
         var remaining: Double = distance
         var proportion: Double
         heading = start
-        while (heading > adjustedTarget && opMode.opModeIsActive()) {
+        while (heading > adjustedTarget) {
+            if(!opMode.opModeIsActive()) {
+                return
+            }
             heading = gyro.getHeading()
             remaining = (heading - start).toDouble()
             proportion = (1 - (Math.abs((remaining) / distance))) * 0.25 + 0.75
@@ -329,7 +334,10 @@ class KTTankDrive(opMode: BROpMode, gearedType: GearedType) : Runnable {
         }
         val leftSpeed: Double = Math.min(0.2, leftSpeed)
         val rightSpeed: Double = Math.min(0.2, rightSpeed)
-        while (heading > finalTarget && opMode.opModeIsActive()) {
+        while (heading > finalTarget) {
+            if(!opMode.opModeIsActive()) {
+                return
+            }
             heading = gyro.getHeading()
             drive(leftSpeed, rightSpeed)
         }
@@ -345,7 +353,10 @@ class KTTankDrive(opMode: BROpMode, gearedType: GearedType) : Runnable {
         var current: Int = heading
         var last: Int = heading
         while (current > target) {
-            while (derivative >= -180 && opMode.opModeIsActive()) {
+            while (derivative >= -180) {
+                if(!opMode.opModeIsActive()) {
+                    return
+                }
                 derivative = current - last
                 last = current
                 current = gyro.getHeading()
@@ -357,7 +368,10 @@ class KTTankDrive(opMode: BROpMode, gearedType: GearedType) : Runnable {
         var remaining: Double = distance
         var proportion: Double
         heading = start
-        while (heading < adjustedTarget && opMode.opModeIsActive()) {
+        while (heading < adjustedTarget) {
+            if(!opMode.opModeIsActive()) {
+                return
+            }
             heading = gyro.getHeading()
             remaining = (heading - start).toDouble()
             proportion = (1 - (Math.abs((remaining) / distance))) * 0.25 + 0.75
@@ -365,7 +379,10 @@ class KTTankDrive(opMode: BROpMode, gearedType: GearedType) : Runnable {
         }
         val leftSpeed: Double = Math.min(0.2, leftSpeed)
         val rightSpeed: Double = Math.min(0.2, rightSpeed)
-        while (heading < finalTarget && opMode.opModeIsActive()) {
+        while (heading < finalTarget) {
+            if(!opMode.opModeIsActive()) {
+                return
+            }
             heading = gyro.getHeading()
             drive(leftSpeed, rightSpeed)
         }

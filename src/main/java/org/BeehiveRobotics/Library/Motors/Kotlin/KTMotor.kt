@@ -65,6 +65,9 @@ class KTMotor constructor(opMode: BROpMode, name: String) : Runnable {
             thread.start()
         } else {
             while (!this.isAtTarget()) {
+                if(!opMode.opModeIsActive()) {
+                    return
+                }
                 setPower(power)
             }
         }
@@ -146,7 +149,10 @@ class KTMotor constructor(opMode: BROpMode, name: String) : Runnable {
     }
 
     override fun run() {
-        while (!this.isAtTarget() && this.opMode.opModeIsActive()) {
+        while (!this.isAtTarget()) {
+            if(!opMode.opModeIsActive()) {
+                return
+            }
             this.setPower(this.power)
         }
         this.stopMotor()
