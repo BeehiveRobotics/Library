@@ -1,4 +1,4 @@
-package org.BeehiveRobotics.Library.Util;
+package org.BeehiveRobotics.Library.Util.Java;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -19,8 +19,13 @@ public abstract class BROpMode extends LinearOpMode {
         this.opModeType = opModeType;
     }
 
-    public final void showLine(String line) {
+    public final void addLine(String line) {
         telemetry.addLine(line);
+        telemetry.update();
+    }
+
+    public final void addData(String title, String data) {
+        telemetry.addData(title, data);
         telemetry.update();
     }
 
@@ -33,12 +38,15 @@ public abstract class BROpMode extends LinearOpMode {
             controller2 = new Controller(gamepad2);
             initialize();
             waitForStart();
-            if (opModeType == OpModeType.Autonomous) {
-                run();
-            } else {
-                while (opModeIsActive()) {
+            switch (opModeType) {
+                case TeleOp:
+                    while (opModeIsActive()) {
+                        run();
+                        controller1.update();
+                        controller2.update();
+                    }
+                case Autonomous:
                     run();
-                }
             }
         } finally {
             end();

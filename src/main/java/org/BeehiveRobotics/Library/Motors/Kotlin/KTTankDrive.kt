@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.HardwareMap
 import org.BeehiveRobotics.Library.Sensors.Kotlin.MRGyro
-import org.BeehiveRobotics.Library.Util.BROpMode
+import org.BeehiveRobotics.Library.Util.Kotlin.BROpMode
 
 
 class KTTankDrive(opMode: BROpMode, gearedType: GearedType) : Runnable {
@@ -36,6 +36,7 @@ class KTTankDrive(opMode: BROpMode, gearedType: GearedType) : Runnable {
         RearRight = KTMotor(opMode, "rr")
         this.gyro = MRGyro(opMode, "g1")
     }
+
     fun setMinSpeed(speed: Double): KTTankDrive {
         this.MIN_SPEED = speed
         FrontLeft.setMinSpeed(MIN_SPEED)
@@ -58,7 +59,7 @@ class KTTankDrive(opMode: BROpMode, gearedType: GearedType) : Runnable {
         NORMAL, REVERSED
     }
 
-    constructor(opMode: BROpMode): this(opMode, GearedType.NORMAL)
+    constructor(opMode: BROpMode) : this(opMode, GearedType.NORMAL)
 
     fun init() {
         if (gearedType == GearedType.NORMAL) {
@@ -309,37 +310,43 @@ class KTTankDrive(opMode: BROpMode, gearedType: GearedType) : Runnable {
         var last: Int = heading
         while (current < target) {
             while (derivative <= 180) {
-                if(!opMode.opModeIsActive()) {
+                if (!opMode.opModeIsActive()) {
                     return
                 }
                 derivative = current - last
                 last = current
                 current = gyro.getHeading()
+                opMode.telemetry.addData("AVG Speed", avgSpeed())
+                opMode.telemetry.update()
             }
         }
         sleep(100)
-        val start: Int = current - last
+        val start: Int = gyro.getHeading()
         val distance: Double = adjustedTarget - start
         var remaining: Double = distance
         var proportion: Double
         heading = start
         while (heading > adjustedTarget) {
-            if(!opMode.opModeIsActive()) {
+            if (!opMode.opModeIsActive()) {
                 return
             }
             heading = gyro.getHeading()
             remaining = (heading - start).toDouble()
-            proportion = (1 - (Math.abs((remaining) / distance))) * 0.25 + 0.75
+            proportion = (1 - (Math.abs((remaining) / distance))) * 0.75 + 0.25
             drive(leftSpeed * proportion, rightSpeed * proportion)
+            opMode.telemetry.addData("AVG Speed", avgSpeed())
+            opMode.telemetry.update()
         }
         val leftSpeed: Double = Math.min(0.2, leftSpeed)
         val rightSpeed: Double = Math.min(0.2, rightSpeed)
         while (heading > finalTarget) {
-            if(!opMode.opModeIsActive()) {
+            if (!opMode.opModeIsActive()) {
                 return
             }
             heading = gyro.getHeading()
             drive(leftSpeed, rightSpeed)
+            opMode.telemetry.addData("AVG Speed", avgSpeed())
+            opMode.telemetry.update()
         }
         stopMotors()
     }
@@ -354,37 +361,43 @@ class KTTankDrive(opMode: BROpMode, gearedType: GearedType) : Runnable {
         var last: Int = heading
         while (current > target) {
             while (derivative >= -180) {
-                if(!opMode.opModeIsActive()) {
+                if (!opMode.opModeIsActive()) {
                     return
                 }
                 derivative = current - last
                 last = current
                 current = gyro.getHeading()
+                opMode.telemetry.addData("AVG Speed", avgSpeed())
+                opMode.telemetry.update()
             }
         }
         sleep(100)
-        val start: Int = current - last
+        val start: Int = gyro.getHeading()
         val distance: Double = adjustedTarget - start
         var remaining: Double = distance
         var proportion: Double
         heading = start
         while (heading < adjustedTarget) {
-            if(!opMode.opModeIsActive()) {
+            if (!opMode.opModeIsActive()) {
                 return
             }
             heading = gyro.getHeading()
             remaining = (heading - start).toDouble()
-            proportion = (1 - (Math.abs((remaining) / distance))) * 0.25 + 0.75
+            proportion = (1 - (Math.abs((remaining) / distance))) * 0.75 + 0.25
             drive(leftSpeed * proportion, rightSpeed * proportion)
+            opMode.telemetry.addData("AVG Speed", avgSpeed())
+            opMode.telemetry.update()
         }
         val leftSpeed: Double = Math.min(0.2, leftSpeed)
         val rightSpeed: Double = Math.min(0.2, rightSpeed)
         while (heading < finalTarget) {
-            if(!opMode.opModeIsActive()) {
+            if (!opMode.opModeIsActive()) {
                 return
             }
             heading = gyro.getHeading()
             drive(leftSpeed, rightSpeed)
+            opMode.telemetry.addData("AVG Speed", avgSpeed())
+            opMode.telemetry.update()
         }
         stopMotors()
 
@@ -395,6 +408,10 @@ class KTTankDrive(opMode: BROpMode, gearedType: GearedType) : Runnable {
             Thread.sleep(miliseconds)
         } catch (e: Exception) {
         }
+    }
+
+    fun avgSpeed(): Double {
+        return (Math.abs(FrontLeft.getPower()) + Math.abs(FrontRight.getPower()) + Math.abs(RearLeft.getPower()) + Math.abs(RearRight.getPower())) / 4
     }
 
 }

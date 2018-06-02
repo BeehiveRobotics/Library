@@ -3,7 +3,7 @@ package org.BeehiveRobotics.Library.Motors.Kotlin
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.util.Range
-import org.BeehiveRobotics.Library.Util.BROpMode
+import org.BeehiveRobotics.Library.Util.Kotlin.BROpMode
 
 class KTMotor constructor(opMode: BROpMode, name: String) : Runnable {
     private val RAMP_LOG_EXPO = 0.8
@@ -157,6 +157,10 @@ class KTMotor constructor(opMode: BROpMode, name: String) : Runnable {
         }
         this.stopMotor()
         Thread.currentThread().interrupt()
+    }
+
+    fun getPower(): Double {
+        return motor.power
     }
 
 }
