@@ -4,7 +4,12 @@ import org.BeehiveRobotics.Library.Util.Kotlin.BROpMode
 
 @Suppress("NAME_SHADOWING")
 class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType) : Runnable, KTDriveMotorSystem(opMode, gearedType) {
+    enum class DriveState {
+        Encoders, Gyro, Time, Other, Stopped
+    }
+    private var currentDriveMode: DriveState = DriveState.Stopped
     fun drive(left: Double, right: Double, inches: Double, waitForCompletion: Boolean = true) {
+        currentDriveMode = DriveState.Encoders
         super.resetEncoders()
         val clicks: Double = super.inches_to_clicks(inches)
         super.setTargets(clicks, clicks, clicks, clicks)
@@ -22,58 +27,59 @@ class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType) : R
         }
         super.stopMotors()
         isBusy = false
+        currentDriveMode = DriveState.Stopped
     }
 
     fun drive(left: Double, right: Double) {
         setRawPowers(left, right, left, right)
     }
 
-    fun forward(speed: Double, inches: Double) {
+    fun forward(speed: Double, inches: Double, waitForCompletion: Boolean = true) {
         var speed: Double = speed
         speed = Math.abs(speed)
-        drive(speed, speed, inches)
+        drive(speed, speed, inches, waitForCompletion)
     }
 
-    fun backward(speed: Double, inches: Double) {
+    fun backward(speed: Double, inches: Double, waitForCompletion: Boolean = true) {
         var speed: Double = speed
         speed = -Math.abs(speed)
-        drive(speed, speed, inches)
+        drive(speed, speed, inches, waitForCompletion)
     }
 
-    fun spinRight(speed: Double, inches: Double) {
+    fun spinRight(speed: Double, inches: Double, waitForCompletion: Boolean = true) {
         var speed: Double = speed
         speed = Math.abs(speed)
-        drive(speed, -speed, inches)
+        drive(speed, -speed, inches, waitForCompletion)
     }
 
-    fun spinLeft(speed: Double, inches: Double) {
+    fun spinLeft(speed: Double, inches: Double, waitForCompletion: Boolean = true) {
         var speed: Double = speed
         speed = -Math.abs(speed)
-        drive(speed, -speed, inches)
+        drive(speed, -speed, inches, waitForCompletion)
     }
 
-    fun leftForward(speed: Double, inches: Double) {
+    fun leftForward(speed: Double, inches: Double, waitForCompletion: Boolean = true) {
         var speed: Double = speed
         speed = Math.abs(speed)
-        drive(speed, 0.0, inches)
+        drive(speed, 0.0, inches, waitForCompletion)
     }
 
-    fun leftBackward(speed: Double, inches: Double) {
+    fun leftBackward(speed: Double, inches: Double, waitForCompletion: Boolean = true) {
         var speed: Double = speed
         speed = -Math.abs(speed)
-        drive(speed, 0.0, inches)
+        drive(speed, 0.0, inches, waitForCompletion)
     }
 
-    fun rightForward(speed: Double, inches: Double) {
+    fun rightForward(speed: Double, inches: Double, waitForCompletion: Boolean = true) {
         var speed: Double = speed
         speed = Math.abs(speed)
-        drive(0.0, speed, inches)
+        drive(0.0, speed, inches, waitForCompletion)
     }
 
-    fun rightBackward(speed: Double, inches: Double) {
+    fun rightBackward(speed: Double, inches: Double, waitForCompletion: Boolean = true) {
         var speed: Double = speed
         speed = -Math.abs(speed)
-        drive(0.0, speed, inches)
+        drive(0.0, speed, inches, waitForCompletion)
     }
 
     fun forward(speed: Double) {
@@ -125,6 +131,7 @@ class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType) : R
     }
 
     fun rightGyro(leftSpeed: Double, rightSpeed: Double, target: Double) {
+        currentDriveMode = DriveState.Gyro
         val adjustedTarget: Double = calculateAdjustedTarget(target, TurnDirection.RIGHT)
         val finalTarget: Double = calculateFinalTarget(target, TurnDirection.RIGHT)
         this.heading = gyro.getHeading()
@@ -140,8 +147,6 @@ class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType) : R
                 derivative = current - last
                 last = current
                 current = gyro.getHeading()
-                //opMode.telemetry.addData("AVG Speed", avgSpeed())
-                //opMode.telemetry.update()
             }
         }
         sleep(100)
@@ -155,11 +160,8 @@ class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType) : R
                 return
             }
             heading = gyro.getHeading()
-            //remaining = (heading - start).toDouble()
             proportion = calculateProportion(heading.toDouble(), start.toDouble(), distance)
             drive(leftSpeed * proportion, rightSpeed * proportion)
-            //opMode.telemetry.addData("AVG Speed", avgSpeed())
-            //opMode.telemetry.update()
         }
         val leftSpeed: Double = GYRO_FINAL_SPEED
         val rightSpeed: Double = GYRO_FINAL_SPEED
@@ -169,13 +171,13 @@ class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType) : R
             }
             heading = gyro.getHeading()
             drive(leftSpeed, rightSpeed)
-            //opMode.telemetry.addData("AVG Speed", avgSpeed())
-            //opMode.telemetry.update()
         }
         stopMotors()
+        currentDriveMode = DriveState.Stopped
     }
 
     fun leftGyro(leftSpeed: Double, rightSpeed: Double, target: Double) {
+        currentDriveMode = DriveState.Gyro
         val adjustedTarget: Double = calculateAdjustedTarget(target, TurnDirection.LEFT)
         val finalTarget: Double = calculateFinalTarget(target, TurnDirection.LEFT)
         this.heading = gyro.getHeading()
@@ -191,8 +193,6 @@ class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType) : R
                 derivative = current - last
                 last = current
                 current = gyro.getHeading()
-                //opMode.telemetry.addData("AVG Speed", avgSpeed())
-                //opMode.telemetry.update()
             }
         }
         sleep(100)
@@ -206,11 +206,8 @@ class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType) : R
                 return
             }
             heading = gyro.getHeading()
-            //remaining = (heading - start).toDouble()
             proportion = calculateProportion(heading.toDouble(), start.toDouble(), distance)
             drive(leftSpeed * proportion, rightSpeed * proportion)
-            //opMode.telemetry.addData("AVG Speed", avgSpeed())
-            //opMode.telemetry.update()
         }
         val leftSpeed: Double = GYRO_FINAL_SPEED
         val rightSpeed: Double = GYRO_FINAL_SPEED
@@ -220,10 +217,12 @@ class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType) : R
             }
             heading = gyro.getHeading()
             drive(leftSpeed, rightSpeed)
-            //opMode.telemetry.addData("AVG Speed", avgSpeed())
-            //opMode.telemetry.update()
         }
         stopMotors()
+        currentDriveMode = DriveState.Stopped
+    }
+    override fun run() {
+        
     }
 
 }
