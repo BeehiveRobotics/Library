@@ -142,6 +142,7 @@ class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType) : R
         while (current < target) {
             while (derivative <= 180) {
                 if (!opMode.opModeIsActive()) {
+                    stopMotors()
                     return
                 }
                 derivative = current - last
@@ -157,16 +158,18 @@ class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType) : R
         heading = start
         while (heading > adjustedTarget) {
             if (!opMode.opModeIsActive()) {
+                stopMotors()
                 return
             }
             heading = gyro.getHeading()
             proportion = calculateProportion(heading.toDouble(), start.toDouble(), distance)
             drive(leftSpeed * proportion, rightSpeed * proportion)
         }
-        val leftSpeed: Double = GYRO_FINAL_SPEED
-        val rightSpeed: Double = GYRO_FINAL_SPEED
+        val leftSpeed: Double = Math.min(GYRO_FINAL_SPEED, leftSpeed)
+        val rightSpeed: Double = Math.min(GYRO_FINAL_SPEED, rightSpeed)
         while (heading > finalTarget) {
             if (!opMode.opModeIsActive()) {
+                stopMotors()
                 return
             }
             heading = gyro.getHeading()
@@ -174,6 +177,10 @@ class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType) : R
         }
         stopMotors()
         currentDriveMode = DriveState.Stopped
+    }
+
+    fun rightGyro(speed: Double, target: Double) {
+        rightGyro(Math.abs(speed), -Math.abs(speed), target)
     }
 
     fun leftGyro(leftSpeed: Double, rightSpeed: Double, target: Double) {
@@ -188,6 +195,7 @@ class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType) : R
         while (current > target) {
             while (derivative >= -180) {
                 if (!opMode.opModeIsActive()) {
+                    stopMotors()
                     return
                 }
                 derivative = current - last
@@ -203,16 +211,18 @@ class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType) : R
         heading = start
         while (heading < adjustedTarget) {
             if (!opMode.opModeIsActive()) {
+                stopMotors()
                 return
             }
             heading = gyro.getHeading()
             proportion = calculateProportion(heading.toDouble(), start.toDouble(), distance)
             drive(leftSpeed * proportion, rightSpeed * proportion)
         }
-        val leftSpeed: Double = GYRO_FINAL_SPEED
-        val rightSpeed: Double = GYRO_FINAL_SPEED
+        val leftSpeed: Double = Math.min(GYRO_FINAL_SPEED, leftSpeed)
+        val rightSpeed: Double = Math.min(GYRO_FINAL_SPEED, rightSpeed)
         while (heading < finalTarget) {
             if (!opMode.opModeIsActive()) {
+                stopMotors()
                 return
             }
             heading = gyro.getHeading()
@@ -221,8 +231,8 @@ class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType) : R
         stopMotors()
         currentDriveMode = DriveState.Stopped
     }
-    override fun run() {
-        
+    fun leftGyro(speed: Double, target: Double) {
+        leftGyro(-Math.abs(speed), Math.abs(speed), target)
     }
-
 }
+//TODO: Add actual DriveState stuff into gyro turning to allow for gyro turning to be on different thread.

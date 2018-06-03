@@ -26,6 +26,7 @@ class MecanumDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType):
                 if (!opMode.opModeIsActive()) {
                     super.stopMotors()
                     isBusy = false
+                    return
                 }
             }
         } else {
@@ -113,7 +114,101 @@ class MecanumDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType):
         drive(0.0, -0.5*Math.abs(speed), 0.5*Math.abs(speed))
     }
 
+    fun rightGyro(x: Double, y: Double, z: Double, target: Double) {
+        val adjustedTarget: Double = super.calculateAdjustedTarget(target, TurnDirection.RIGHT)
+        val finalTarget: Double = super.calculateFinalTarget(target, TurnDirection.RIGHT)
+        this.heading = gyro.getHeading()
+        var derivative: Int = 0
+        drive(x, y, z)
+        var current: Int = heading
+        var last: Int = heading
+        while (current < target) {
+            while (derivative <= 180) {
+                if (!opMode.opModeIsActive()) {
+                    stopMotors()
+                    return
+                }
+                derivative = current - last
+                last = current
+                current = gyro.getHeading()
+            }
+        }
+        sleep(100)
+        val start: Int = gyro.getHeading()
+        val distance: Double = adjustedTarget - start
+        var remaining: Double = distance
+        var proportion: Double
+        heading = start
+        while (heading > adjustedTarget) {
+            if (!opMode.opModeIsActive()) {
+                stopMotors()
+                return
+            }
+            heading = gyro.getHeading()
+            proportion = calculateProportion(heading.toDouble(), start.toDouble(), distance)
+            drive(x * proportion, y * proportion, z * proportion)
+        }
+        val x: Double = Math.min(GYRO_FINAL_SPEED, x)
+        val y: Double = Math.min(GYRO_FINAL_SPEED, y)
+        val z: Double = Math.min(GYRO_FINAL_SPEED, z)
+        while (heading > finalTarget) {
+            if (!opMode.opModeIsActive()) {
+                stopMotors()
+                return
+            }
+            heading = gyro.getHeading()
+            drive(x, y, z)
+        }
+        stopMotors()
+    }
 
+    fun leftGyro(x: Double, y: Double, z: Double, target: Double) {
+        val adjustedTarget: Double = super.calculateAdjustedTarget(target, TurnDirection.LEFT)
+        val finalTarget: Double = super.calculateFinalTarget(target, TurnDirection.LEFT)
+        this.heading = gyro.getHeading()
+        var derivative: Int = 0
+        drive(x, y, z)
+        var current: Int = heading
+        var last: Int = heading
+        while (current > target) {
+            while (derivative >= -180) {
+                if (!opMode.opModeIsActive()) {
+                    stopMotors()
+                    return
+                }
+                derivative = current - last
+                last = current
+                current = gyro.getHeading()
+            }
+        }
+        sleep(100)
+        val start: Int = gyro.getHeading()
+        val distance: Double = adjustedTarget - start
+        var remaining: Double = distance
+        var proportion: Double
+        heading = start
+        while (heading < adjustedTarget) {
+            if (!opMode.opModeIsActive()) {
+                stopMotors()
+                return
+            }
+            heading = gyro.getHeading()
+            proportion = calculateProportion(heading.toDouble(), start.toDouble(), distance)
+            drive(x * proportion, y * proportion, z * proportion)
+        }
+        val x: Double = Math.min(GYRO_FINAL_SPEED, x)
+        val y: Double = Math.min(GYRO_FINAL_SPEED, y)
+        val z: Double = Math.min(GYRO_FINAL_SPEED, z)
+        while (heading < finalTarget) {
+            if (!opMode.opModeIsActive()) {
+                stopMotors()
+                return
+            }
+            heading = gyro.getHeading()
+            drive(x, y, z)
+        }
+        stopMotors()
+    }
 
 
     private fun findHigh(values: DoubleArray): Double {
@@ -126,3 +221,4 @@ class MecanumDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType):
         return high
     }
 }
+//TODO: Add DriveState stuff to allow for gyro turning to run on another thread.
