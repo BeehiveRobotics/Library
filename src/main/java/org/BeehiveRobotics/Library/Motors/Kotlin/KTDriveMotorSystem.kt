@@ -7,10 +7,10 @@ import org.BeehiveRobotics.Library.Util.Kotlin.BROpMode
 
 abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Runnable {
     protected val opMode: BROpMode = opMode
-    protected lateinit var FrontLeft: KTMotor
-    protected lateinit var FrontRight: KTMotor
-    protected lateinit var RearLeft: KTMotor
-    protected lateinit var RearRight: KTMotor
+    protected lateinit var FrontLeft: Motor
+    protected lateinit var FrontRight: Motor
+    protected lateinit var RearLeft: Motor
+    protected lateinit var RearRight: Motor
     protected lateinit var gyro: MRGyro
     protected var heading: Int = 0
     protected val GYRO_LATENCY_OFFSET: Double = 2.75
@@ -36,10 +36,10 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
     }
 
     fun mapHardware() {
-        FrontLeft = KTMotor(opMode, "fl")
-        FrontRight = KTMotor(opMode, "fr")
-        RearLeft = KTMotor(opMode, "rl")
-        RearRight = KTMotor(opMode, "rr")
+        FrontLeft = Motor(opMode, "fl")
+        FrontRight = Motor(opMode, "fr")
+        RearLeft = Motor(opMode, "rl")
+        RearRight = Motor(opMode, "rr")
     }
 
     fun setMinSpeed(speed: Double): KTDriveMotorSystem {

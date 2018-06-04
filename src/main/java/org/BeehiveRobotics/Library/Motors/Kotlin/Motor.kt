@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.util.Range
 import org.BeehiveRobotics.Library.Util.Kotlin.BROpMode
 
-class KTMotor constructor(opMode: BROpMode, name: String) : Runnable {
+class Motor(opMode: BROpMode, name: String) : Runnable {
     private val RAMP_LOG_EXPO = 0.8
     private var MIN_SPEED = 0.2
     private var MAX_SPEED = 1.0
@@ -17,27 +17,27 @@ class KTMotor constructor(opMode: BROpMode, name: String) : Runnable {
     private val opMode : BROpMode = opMode
     private val motor : DcMotor = opMode.hardwareMap.get(DcMotor::class.java, name)
 
-    internal fun setRunMode(runMode: DcMotor.RunMode): KTMotor {
+    internal fun setRunMode(runMode: DcMotor.RunMode): Motor {
         this.motor.mode = runMode
         return this
     }
 
-    internal fun setModel(motorModel: MotorModel): KTMotor {
+    internal fun setModel(motorModel: MotorModel): Motor {
         this.model = motorModel
         return this
     }
 
-    internal fun setMinSpeed(speed: Double): KTMotor {
+    internal fun setMinSpeed(speed: Double): Motor {
         this.MIN_SPEED = Math.abs(speed)
         return this
     }
 
-    fun setMaxSpeed(speed: Double): KTMotor {
+    fun setMaxSpeed(speed: Double): Motor {
         this.MAX_SPEED = Math.abs(speed)
         return this
     }
 
-    internal fun resetEncoder(): KTMotor {
+    internal fun resetEncoder(): Motor {
         val initialBehavior = this.getRunMode()
         this.setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
         this.setRunMode(initialBehavior)
@@ -48,7 +48,7 @@ class KTMotor constructor(opMode: BROpMode, name: String) : Runnable {
         return this.motor.currentPosition.toDouble()
     }
 
-    internal fun setZeroPowerBehavior(zeroPowerBehavior: DcMotor.ZeroPowerBehavior): KTMotor {
+    internal fun setZeroPowerBehavior(zeroPowerBehavior: DcMotor.ZeroPowerBehavior): Motor {
         this.motor.zeroPowerBehavior = zeroPowerBehavior
         return this
     }
@@ -142,7 +142,7 @@ class KTMotor constructor(opMode: BROpMode, name: String) : Runnable {
         return Math.abs(current) >= Math.abs(target)
     }
 
-    fun setDirection(direction: DcMotorSimple.Direction): KTMotor {
+    fun setDirection(direction: DcMotorSimple.Direction): Motor {
         this.motor.direction = direction
         return this
 

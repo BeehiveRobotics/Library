@@ -4,7 +4,7 @@ import org.BeehiveRobotics.Library.Util.Kotlin.BROpMode
 
 @Suppress("NAME_SHADOWING")
 
-class MecanumDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType): Runnable, KTDriveMotorSystem(opMode, gearedType) {
+class MecanumDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType = GearedType.NORMAL): Runnable, KTDriveMotorSystem(opMode, gearedType) {
     fun drive(x: Double, y: Double, z: Double, inches: Double, waitForCompletion: Boolean = true) {
         super.resetEncoders()
         val clicks: Double = super.inches_to_clicks(inches)

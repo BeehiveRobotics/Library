@@ -3,7 +3,7 @@ package org.BeehiveRobotics.Library.Motors.Kotlin
 import org.BeehiveRobotics.Library.Util.Kotlin.BROpMode
 
 @Suppress("NAME_SHADOWING")
-class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType) : Runnable, KTDriveMotorSystem(opMode, gearedType) {
+class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType = GearedType.NORMAL) : Runnable, KTDriveMotorSystem(opMode, gearedType) {
     enum class DriveState {
         Encoders, Gyro, Time, Other, Stopped
     }
