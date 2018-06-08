@@ -88,7 +88,7 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
         return this
     }
 
-    protected fun setZeroPowerBehavior(zeroPowerBehavior: DcMotor.ZeroPowerBehavior): KTDriveMotorSystem {
+    fun setZeroPowerBehavior(zeroPowerBehavior: DcMotor.ZeroPowerBehavior): KTDriveMotorSystem {
         FrontLeft.setZeroPowerBehavior(zeroPowerBehavior)
         FrontRight.setZeroPowerBehavior(zeroPowerBehavior)
         RearLeft.setZeroPowerBehavior(zeroPowerBehavior)

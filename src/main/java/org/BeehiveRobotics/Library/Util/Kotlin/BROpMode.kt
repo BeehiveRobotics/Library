@@ -24,7 +24,7 @@ abstract class BROpMode: LinearOpMode() {
         this.opModeType = opModeType
     }
 
-    fun addLine(line: String) {
+    fun showLine(line: String) {
         telemetry.addLine(line)
         telemetry.update()
     }

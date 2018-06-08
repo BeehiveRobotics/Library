@@ -1,13 +1,13 @@
-package org.firstinspires.ftc.teamcode
+package org.BeehiveRobotics.Library.Motors.Kotlin
 
-import org.BeehiveRobotics.Library.Motors.Kotlin.MecanumDrive
+import com.qualcomm.robotcore.hardware.DcMotor
 import org.BeehiveRobotics.Library.Util.Kotlin.BROpMode
 
-class MecanumRobot(opMode: BROpMode) {
-    private val opMode: BROpMode = opMode
+class MecanumRobot constructor(private val opMode: BROpMode) {
     val drive: MecanumDrive = MecanumDrive(opMode)
     fun init() {
         drive.mapHardware()
+        drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE)
         drive.init()
     }
 
