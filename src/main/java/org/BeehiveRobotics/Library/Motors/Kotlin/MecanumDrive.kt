@@ -1,6 +1,7 @@
 package org.BeehiveRobotics.Library.Motors.Kotlin
 
 import org.BeehiveRobotics.Library.Util.Kotlin.BROpMode
+import com.qualcomm.robotcore.util.Range
 
 @Suppress("NAME_SHADOWING")
 
@@ -8,13 +9,13 @@ class MecanumDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType =
     fun drive(x: Double, y: Double, z: Double, inches: Double, waitForCompletion: Boolean = true) {
         super.resetEncoders()
         val clicks: Double = super.inches_to_clicks(inches)
-        val flSpeed: Double = y + z - x
-        val frSpeed: Double = y - z + x
-        val rlSpeed: Double = y + z + x
-        val rrSpeed: Double = y - z - x
+        val flSpeed: Double = clip(y + z + x)
+        val frSpeed: Double = clip(y - z - x)
+        val rlSpeed: Double = clip(y + z - x)
+        val rrSpeed: Double = clip(y - z + x)
         val list: DoubleArray = DoubleArray(4)
         list[0] = flSpeed; list[1] = frSpeed; list[2] = rlSpeed; list[3] = rrSpeed
-        val high = findHigh(list)
+        val high: Double = findHigh(list)
         val flTarget: Double = clicks * flSpeed / high
         val frTarget: Double = clicks * frSpeed / high
         val rlTarget: Double = clicks * rlSpeed / high
@@ -37,17 +38,17 @@ class MecanumDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType =
         isBusy = false
     }
     fun drive(x: Double, y: Double, z: Double) {
-        val flSpeed: Double = y + z - x
-        val frSpeed: Double = y - z + x
-        val rlSpeed: Double = y + z + x
-        val rrSpeed: Double = y - z - x
+        val flSpeed: Double = clip(y + z + x)
+        val frSpeed: Double = clip(y - z - x)
+        val rlSpeed: Double = clip(y + z - x)
+        val rrSpeed: Double = clip(y - z + x)
         super.setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
     }
     fun drive(xLeft: Double, yLeft: Double, xRight: Double, yRight: Double) {
-        val flSpeed: Double = yLeft - xLeft
-        val frSpeed: Double = yRight + xRight
-        val rlSpeed: Double = yLeft + xLeft
-        val rrSpeed: Double = yRight - xRight
+        val flSpeed: Double = clip(yLeft - xLeft)
+        val frSpeed: Double = clip(yRight + xRight)
+        val rlSpeed: Double = clip(yLeft + xLeft)
+        val rrSpeed: Double = clip(yRight - xRight)
         super.setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
     }
 
@@ -82,6 +83,18 @@ class MecanumDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType =
     fun rightBackward(speed: Double, inches: Double, waitForCompletion: Boolean = true) {
         drive(0.0, -0.5*Math.abs(speed), 0.5*Math.abs(speed), inches, waitForCompletion)
     }
+    fun forwardLeft(speed: Double, inches: Double, waitForCompletion: Boolean = true) {
+        drive(-Math.abs(speed), Math.abs(speed), 0.0, inches, waitForCompletion)
+    }
+    fun forwardRight(speed: Double, inches: Double, waitForCompletion: Boolean = true) {
+        drive(Math.abs(speed), Math.abs(speed), 0.0, inches, waitForCompletion)
+    }
+    fun backwardLeft(speed: Double, inches: Double, waitForCompletion: Boolean = true) {
+        drive(-Math.abs(speed), -Math.abs(speed), 0.0, inches, waitForCompletion)
+    }
+    fun backwardRight(speed: Double, inches: Double, waitForCompletion: Boolean = true) {
+        drive(Math.abs(speed), -Math.abs(speed), 0.0, inches, waitForCompletion)
+    }
 
     fun forward(speed: Double) {
         drive(0.0, Math.abs(speed), 0.0)
@@ -112,6 +125,18 @@ class MecanumDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType =
     }
     fun rightBackward(speed: Double) {
         drive(0.0, -0.5*Math.abs(speed), 0.5*Math.abs(speed))
+    }
+    fun forwardLeft(speed: Double) {
+        drive(-Math.abs(speed), Math.abs(speed), 0.0)
+    }
+    fun forwardRight(speed: Double) {
+        drive(Math.abs(speed), Math.abs(speed), 0.0)
+    }
+    fun backwardLeft(speed: Double) {
+        drive(-Math.abs(speed), -Math.abs(speed), 0.0)
+    }
+    fun backwardRight(speed: Double) {
+        drive(Math.abs(speed), -Math.abs(speed), 0.0)
     }
 
     fun rightGyro(x: Double, y: Double, z: Double, target: Double) {
@@ -214,11 +239,18 @@ class MecanumDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType =
     private fun findHigh(values: DoubleArray): Double {
         var high: Double = Double.MIN_VALUE
         for (value: Double in values) {
-            if(value > high){
-                high = value
+            if(Math.abs(value) > high){
+                high = Math.abs(value)
             }
         }
         return high
+    }
+    private fun clip(value: Double): Double {
+        if(value > 0) {
+            return Range.clip(value, 0.0, 1.0)
+        } else if(value < 0) {
+            return Range.clip(value, -1.0, 0.0)
+        } else return 0.0
     }
 }
 //TODO: Add DriveState stuff to allow for gyro turning to run on another thread.

@@ -28,12 +28,21 @@ abstract class BROpMode: LinearOpMode() {
         telemetry.addLine(line)
         telemetry.update()
     }
-
-    fun addData(title: String, data: String) {
-        telemetry.addData(title, data)
-        telemetry.update()
+    fun addLine(line: String) {
+        telemetry.addLine(line)
     }
 
+    fun showData(title: String, value: String) {
+        telemetry.addData(title, value)
+        telemetry.update()
+    }
+    fun addData(title: String, value: String) {
+        telemetry.addData(title, value)
+    }
+
+    fun updateTelemetry() {
+        telemetry.update()
+    }
     @Throws(InterruptedException::class)
     override fun runOpMode() {
         try {

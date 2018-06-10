@@ -2,8 +2,10 @@ package org.BeehiveRobotics.Library.Motors.Kotlin
 
 import com.qualcomm.robotcore.hardware.DcMotor
 import org.BeehiveRobotics.Library.Util.Kotlin.BROpMode
+import com.qualcomm.robotcore.util.ElapsedTime
 
-class MecanumRobot constructor(private val opMode: BROpMode) {
+class MecanumRobot constructor(opMode: BROpMode) {
+    val opMode: BROpMode = opMode
     val drive: MecanumDrive = MecanumDrive(opMode)
     fun init() {
         drive.mapHardware()
@@ -15,13 +17,16 @@ class MecanumRobot constructor(private val opMode: BROpMode) {
         drive.stopMotors()
     }
 
-    companion object {
+    //companion object {
         fun sleep(milliseconds: Long) {
-            try {
-                Thread.sleep(milliseconds)
-            } catch (e: Exception) {
+            val time: ElapsedTime = ElapsedTime()
+            time.reset()
+            while(time.milliseconds() < milliseconds) {
+                if(!(opMode.opModeIsActive())) {
+                    return
+                }
             }
         }
-    }
+    //}
 
 }

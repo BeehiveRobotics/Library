@@ -3,6 +3,7 @@ package org.BeehiveRobotics.Library.Motors.Kotlin
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.util.Range
+import com.qualcomm.robotcore.util.ElapsedTime
 import org.BeehiveRobotics.Library.Util.Kotlin.BROpMode
 
 class Motor(opMode: BROpMode, name: String) : Runnable {
@@ -17,12 +18,18 @@ class Motor(opMode: BROpMode, name: String) : Runnable {
     private val opMode : BROpMode = opMode
     private val motor : DcMotor = opMode.hardwareMap.get(DcMotor::class.java, name)
 
+    init {
+        setModel(MotorModel.NEVEREST40)
+        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE)
+        resetEncoder()
+    }
+
     internal fun setRunMode(runMode: DcMotor.RunMode): Motor {
         this.motor.mode = runMode
         return this
     }
 
-    internal fun setModel(motorModel: MotorModel): Motor {
+    fun setModel(motorModel: MotorModel): Motor {
         this.model = motorModel
         return this
     }
@@ -38,9 +45,11 @@ class Motor(opMode: BROpMode, name: String) : Runnable {
     }
 
     internal fun resetEncoder(): Motor {
-        val initialBehavior = this.getRunMode()
+        val initialBehavior: DcMotor.RunMode = this.getRunMode()
         this.setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
         this.setRunMode(initialBehavior)
+        this.current = 0.0
+        this.target = 0.0
         return this
     }
 
@@ -53,7 +62,9 @@ class Motor(opMode: BROpMode, name: String) : Runnable {
         return this
     }
 
-    internal fun setTarget(target: Double) {
+    fun setTarget(target: Double) {
+        resetEncoder()
+        this.current = getCurrentPosition()
         this.target = Math.abs(target)
     }
 
@@ -91,16 +102,22 @@ class Motor(opMode: BROpMode, name: String) : Runnable {
         }
     }
 
-    internal fun setPower(power: Double) {
+    fun setPower(power: Double) {
         this.power = power
-        if (!this.opMode.opModeIsActive() || power == 0.0) {
+        if (!this.opMode.opModeIsActive() || power == 0.0 || isAtTarget()) {
             stopMotor()
             return
         }
-        this.current = getCurrentPosition()
-        val k = 4 / target
-        val calculated_power = k * this.current * (1 - current / target) * power + java.lang.Double.MIN_VALUE
-        val expo_speed = Math.pow(Math.abs(calculated_power), RAMP_LOG_EXPO)
+        this.current = Math.abs(getCurrentPosition())
+        val k: Double = 4.0 / target
+        val calculated_power: Double = k * this.current * (1 - (this.current / this.target)) * power + java.lang.Double.MIN_VALUE
+        val expo_speed: Double = Math.pow(Math.abs(calculated_power), RAMP_LOG_EXPO)
+        if(expo_speed > 1.2) {
+            opMode.addData("Expo_Speed is ", expo_speed.toString())
+        }
+        opMode.addData("calcultaed_speed", calculated_power.toString())
+        opMode.addData("k", k.toString())
+        opMode.addData("current", current.toString())
         if (power < 0) {
             setRawPower(-expo_speed)
             return
@@ -108,7 +125,7 @@ class Motor(opMode: BROpMode, name: String) : Runnable {
         setRawPower(expo_speed)
     }
 
-    internal fun setPower(power: Double, current: Double, target: Double) {
+    fun setPower(power: Double, current: Double, target: Double) {
         this.power = power
         if (!this.opMode.opModeIsActive() || power == 0.0) {
             stopMotor()
@@ -126,7 +143,7 @@ class Motor(opMode: BROpMode, name: String) : Runnable {
         setRawPower(expo_speed)
     }
 
-    internal fun stopMotor() {
+    fun stopMotor() {
         this.motor.power = 0.0
     }
 
@@ -138,7 +155,7 @@ class Motor(opMode: BROpMode, name: String) : Runnable {
         return this.name
     }
 
-    internal fun isAtTarget(): Boolean {
+    fun isAtTarget(): Boolean {
         return Math.abs(current) >= Math.abs(target)
     }
 
@@ -160,7 +177,21 @@ class Motor(opMode: BROpMode, name: String) : Runnable {
     }
 
     fun getPower(): Double {
+        return this.power
+    }
+    fun getRawPower(): Double {
         return motor.power
     }
+
+    fun sleep(milliseconds: Long) {
+        val time: ElapsedTime = ElapsedTime()
+        time.reset()
+        while(time.milliseconds() < milliseconds) {
+            if(!(opMode.opModeIsActive())) {
+                return
+            }
+        }
+    }
+
 
 }

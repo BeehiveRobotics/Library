@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import org.BeehiveRobotics.Library.Sensors.Kotlin.MRGyro
 import org.BeehiveRobotics.Library.Util.Kotlin.BROpMode
+import com.qualcomm.robotcore.util.ElapsedTime
 
 abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Runnable {
     protected val opMode: BROpMode = opMode
@@ -15,8 +16,7 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
     protected var heading: Int = 0
     protected val GYRO_LATENCY_OFFSET: Double = 2.75
     protected val GYRO_SLOW_MODE_OFFSET: Double = 10.0
-    protected var CPR: Double = 0.0
-    protected var RPM: Int = 0
+    protected var CPR: Double = 1120.0
     protected var WheelDiameter: Double = 0.0
     protected lateinit var model: MotorModel
     protected var MIN_SPEED: Double = 0.25
@@ -115,7 +115,6 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
         RearLeft.setModel(model)
         RearRight.setModel(model)
         this.model = model
-        this.RPM = model.RPM
         this.CPR = model.CPR
         return this
     }
@@ -154,11 +153,15 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
         RearRight.stopMotor()
     }
 
-    fun sleep(miliseconds: Long) {
-        try {
-            Thread.sleep(miliseconds)
-        } catch (e: Exception) {
+    fun sleep(milliseconds: Long) {
+        val time: ElapsedTime = ElapsedTime()
+        time.reset()
+        while(time.milliseconds() < milliseconds) {
+            if(!(opMode.opModeIsActive())) {
+                return
+            }
         }
+
     }
 
     fun avgSpeed(): Double {
