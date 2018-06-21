@@ -24,8 +24,15 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
     protected final val GYRO_FINAL_SPEED: Double = 0.2
     protected var isBusy = false
     protected var gearedType: GearedType = gearedType
+    private var flSpeed: Double = 0.0
+    private var frSpeed: Double = 0.0
+    private var rlSpeed: Double = 0.0
+    private var rrSpeed: Double = 0.0
+    private var target: Double = 0.0
+    private var inches: Double = 0.0
+    private var task: Tasks = Tasks.Stop
 
-    constructor(opMode: BROpMode) : this(opMode, GearedType.NORMAL)
+    constructor(opMode: BROpMode): this(opMode, GearedType.NORMAL)
 
     enum class GearedType {
         NORMAL, REVERSE
@@ -33,6 +40,160 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
 
     enum class TurnDirection {
         LEFT, RIGHT
+    }
+    enum class Tasks {
+        EncoderDrive, RightGyro, LeftGyro, Stop
+    }
+
+    fun drive(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, inches: Double, waitForCompletion: Boolean = true) {
+        this.flSpeed = flSpeed
+        this.frSpeed = frSpeed
+        this.rlSpeed = rlSpeed
+        this.rrSpeed = rrSpeed
+        this.inches = inches
+        resetEncoders()
+        val clicks: Double = inches_to_clicks(inches)
+        val powerList: DoubleArray = DoubleArray(4)
+        powerList[0] = flSpeed; powerList[1] = frSpeed; powerList[2] = rlSpeed; powerList[3] = rrSpeed
+        val highestPower: Double = findHighestPower(powerList)
+        val flTarget: Double = clicks * flSpeed /  highestPower
+        val frTarget: Double = clicks * frSpeed / highestPower
+        val rlTarget: Double = clicks * rlSpeed / highestPower
+        val rrTarget: Double = clicks * rrSpeed / highestPower
+        setTargets(flTarget, frTarget, rlTarget, rrTarget)
+        if(waitForCompletion) {
+            while(!allMotorsAtTarget()) {
+                setPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
+                if(!opMode.opModeIsActive()) {
+                    stopMotors()
+                    return
+                }
+            }
+        } else {
+            this.task = Tasks.EncoderDrive
+            val thread: Thread = Thread(this)
+            thread.start()
+        }
+        stopMotors()
+    } 
+
+
+    fun rightGyro(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, target: Double, waitForCompletion: Boolean = true) {
+        this.flSpeed = flSpeed
+        this.frSpeed = frSpeed
+        this.rlSpeed = rlSpeed
+        this.rrSpeed = rrSpeed
+        this.target = target
+        val adjustedTarget: Double = calculateAdjustedTarget(target, TurnDirection.RIGHT)
+        val finalTarget: Double = calculateFinalTarget(target, TurnDirection.RIGHT)
+        this.heading = gyro.getHeading()
+        var derivative: Int = 0
+        if(waitForCompletion) {
+            setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
+            var current: Int = heading
+            var last: Int = heading
+            while(current < target) {
+                while(derivative <= 180) {
+                    if(!opMode.opModeIsActive()) {
+                        stopMotors()
+                        return
+                    }
+                    derivative = current - last
+                    last = current
+                    current = gyro.getHeading()
+                }
+            }
+            sleep(100)
+            val start: Int = gyro.getHeading()
+            val distance: Double = adjustedTarget - start
+            var proportion: Double
+            heading = start
+            while (heading > adjustedTarget) {
+                if(!opMode.opModeIsActive()) {
+                    stopMotors()
+                    return
+                }
+                heading = gyro.getHeading()
+                proportion = calculateProportion(heading.toDouble(), start.toDouble(), distance)
+                setRawPowers(flSpeed * proportion, frSpeed * proportion, rlSpeed * proportion, rrSpeed * proportion)
+            }
+            val flSpeed: Double = Math.min(GYRO_FINAL_SPEED, flSpeed)
+            val frSpeed: Double = Math.min(GYRO_FINAL_SPEED, frSpeed)
+            val rlSpeed: Double = Math.min(GYRO_FINAL_SPEED, rlSpeed)
+            val rrSpeed: Double = Math.min(GYRO_FINAL_SPEED, rrSpeed)
+            while (heading > finalTarget) {
+                if (!opMode.opModeIsActive()) {
+                    stopMotors()
+                    return
+                }
+                heading = gyro.getHeading()
+                setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
+            }
+            stopMotors()
+        } else {
+            this.task = Tasks.RightGyro
+            val thread: Thread = Thread(this)
+            thread.start()
+        }
+    }
+
+    fun leftGyro(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, target: Double, waitForCompletion: Boolean = true) {
+        this.flSpeed = flSpeed
+        this.frSpeed = frSpeed
+        this.rlSpeed = rlSpeed
+        this.rrSpeed = rrSpeed
+        this.target = target
+        val adjustedTarget: Double = calculateAdjustedTarget(target, TurnDirection.RIGHT)
+        val finalTarget: Double = calculateFinalTarget(target, TurnDirection.RIGHT)
+        this.heading = gyro.getHeading()
+        var derivative: Int = 0
+        if(waitForCompletion) {
+            setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
+            var current: Int = heading
+            var last: Int = heading
+            while(current > target) {
+                while(derivative >= -180) {
+                    if(!opMode.opModeIsActive()) {
+                        stopMotors()
+                        return
+                    }
+                    derivative = current - last
+                    last = current
+                    current = gyro.getHeading()
+                }
+            }
+            sleep(100)
+            val start: Int = gyro.getHeading()
+            val distance: Double = adjustedTarget - start
+            var proportion: Double
+            heading = start
+            while (heading < adjustedTarget) {
+                if(!opMode.opModeIsActive()) {
+                    stopMotors()
+                    return
+                }
+                heading = gyro.getHeading()
+                proportion = calculateProportion(heading.toDouble(), start.toDouble(), distance)
+                setRawPowers(flSpeed * proportion, frSpeed * proportion, rlSpeed * proportion, rrSpeed * proportion)
+            }
+            val flSpeed: Double = Math.min(GYRO_FINAL_SPEED, flSpeed)
+            val frSpeed: Double = Math.min(GYRO_FINAL_SPEED, frSpeed)
+            val rlSpeed: Double = Math.min(GYRO_FINAL_SPEED, rlSpeed)
+            val rrSpeed: Double = Math.min(GYRO_FINAL_SPEED, rrSpeed)
+            while (heading < finalTarget) {
+                if (!opMode.opModeIsActive()) {
+                    stopMotors()
+                    return
+                }
+                heading = gyro.getHeading()
+                setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
+            }
+            stopMotors()
+        } else {
+            this.task = Tasks.LeftGyro
+            val thread: Thread = Thread(this)
+            thread.start()
+        }
     }
 
     fun mapHardware() {
@@ -80,7 +241,7 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
         setMinSpeed(MIN_SPEED)
     }
 
-    protected fun resetEncoders(): KTDriveMotorSystem {
+    internal fun resetEncoders(): KTDriveMotorSystem {
         FrontLeft.resetEncoder()
         FrontRight.resetEncoder()
         RearLeft.resetEncoder()
@@ -119,6 +280,10 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
         return this
     }
 
+    internal fun allMotorsAtTarget(): Boolean {
+        return FrontLeft.isAtTarget() && FrontRight.isAtTarget() && RearLeft.isAtTarget() && RearRight.isAtTarget()
+    }
+
     protected fun setPowers(fl: Double, fr: Double, rl: Double, rr: Double) {
         FrontLeft.setPower(fl)
         FrontRight.setPower(fr)
@@ -133,14 +298,14 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
         RearRight.setRawPower(rr)
     }
 
-    protected fun setTargets(fl: Double, fr: Double, rl: Double, rr: Double) {
+    internal fun setTargets(fl: Double, fr: Double, rl: Double, rr: Double) {
         FrontLeft.setTarget(fl)
         FrontRight.setTarget(fr)
         RearLeft.setTarget(rl)
         RearRight.setTarget(rr)
     }
 
-    protected fun inches_to_clicks(inches: Double): Double {
+    internal fun inches_to_clicks(inches: Double): Double {
         val circumference = WheelDiameter * Math.PI
         return CPR / circumference * inches
 
@@ -165,7 +330,7 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
     }
 
     fun avgSpeed(): Double {
-        return (Math.abs(FrontLeft.getPower()) + Math.abs(FrontRight.getPower()) + Math.abs(RearLeft.getPower()) + Math.abs(RearRight.getPower())) / 4
+        return (Math.abs(FrontLeft.power) + Math.abs(FrontRight.power) + Math.abs(RearLeft.power) + Math.abs(RearRight.power)) / 4
     }
 
     internal fun calculateAdjustedTarget(target: Double, direction: TurnDirection): Double {
@@ -188,17 +353,22 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
         return proportion
     }
 
-    override fun run() {
-        val flThread = Thread(FrontLeft)
-        val frThread = Thread(FrontRight)
-        val rlThread = Thread(RearLeft)
-        val rrThread = Thread(RearRight)
-        flThread.start()
-        frThread.start()
-        rlThread.start()
-        rrThread.start()
+    private fun findHighestPower(values: DoubleArray): Double {
+        var high: Double = Double.MIN_VALUE
+        for (value: Double in values) {
+            if(Math.abs(value) > high){
+                high = Math.abs(value)
+            }
+        }
+        return high
     }
 
-
-
-}
+    override fun run() {
+        when(task) {
+            Tasks.EncoderDrive -> drive(flSpeed, frSpeed, rlSpeed, rrSpeed, inches)
+            Tasks.RightGyro -> rightGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target)
+            Tasks.LeftGyro -> leftGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target)
+            Tasks.Stop -> stopMotors()
+        }
+    }
+} 

@@ -1,2 +1,6 @@
 build/*
 */*.iml
+Library.iml
+.classpath
+.project
+.settings/

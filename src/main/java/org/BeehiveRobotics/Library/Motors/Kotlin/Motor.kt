@@ -6,14 +6,18 @@ import com.qualcomm.robotcore.util.Range
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.BeehiveRobotics.Library.Util.Kotlin.BROpMode
 
-class Motor(opMode: BROpMode, name: String) : Runnable {
+class Motor(opMode: BROpMode, name: String): Runnable {
     private val RAMP_LOG_EXPO = 0.8
     private var MIN_SPEED = 0.2
     private var MAX_SPEED = 1.0
     private var model: MotorModel = MotorModel.NEVEREST40
-    private var target: Double = 0.toDouble()
-    private var current: Double = 0.toDouble()
-    private var power: Double = 0.toDouble()
+    private var target: Double = 0.0
+    private var current: Double = 0.0
+    var power: Double = 0.0
+        get() = this.power
+        private set
+    var rawPower: Double = 0.0
+        get() = motor.power
     private val name: String = name
     private val opMode : BROpMode = opMode
     private val motor : DcMotor = opMode.hardwareMap.get(DcMotor::class.java, name)
@@ -102,27 +106,22 @@ class Motor(opMode: BROpMode, name: String) : Runnable {
         }
     }
 
-    fun setPower(power: Double) {
+    fun setPower(power: Double): Boolean {
         this.power = power
         if (!this.opMode.opModeIsActive() || power == 0.0 || isAtTarget()) {
             stopMotor()
-            return
+            return false
         }
         this.current = Math.abs(getCurrentPosition())
         val k: Double = 4.0 / target
         val calculated_power: Double = k * this.current * (1 - (this.current / this.target)) * power + java.lang.Double.MIN_VALUE
         val expo_speed: Double = Math.pow(Math.abs(calculated_power), RAMP_LOG_EXPO)
-        if(expo_speed > 1.2) {
-            opMode.addData("Expo_Speed is ", expo_speed.toString())
-        }
-        opMode.addData("calcultaed_speed", calculated_power.toString())
-        opMode.addData("k", k.toString())
-        opMode.addData("current", current.toString())
         if (power < 0) {
             setRawPower(-expo_speed)
-            return
+            return true
         }
         setRawPower(expo_speed)
+        return true
     }
 
     fun setPower(power: Double, current: Double, target: Double) {
@@ -174,13 +173,6 @@ class Motor(opMode: BROpMode, name: String) : Runnable {
         }
         this.stopMotor()
         Thread.currentThread().interrupt()
-    }
-
-    fun getPower(): Double {
-        return this.power
-    }
-    fun getRawPower(): Double {
-        return motor.power
     }
 
     fun sleep(milliseconds: Long) {
