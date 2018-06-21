@@ -133,10 +133,8 @@ class MecanumDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType =
     }
 
     private fun clip(value: Double): Double {
-        if(value > 0) {
-            return Range.clip(value, 0.0, 1.0)
-        } else if(value < 0) {
-            return Range.clip(value, -1.0, 0.0)
-        } else return 0.0
+        if(value > 0) return Range.clip(value, 0.0, 1.0)
+        else if(value < 0) return Range.clip(value, -1.0, 0.0)
+        else return 0.0
     }
 }

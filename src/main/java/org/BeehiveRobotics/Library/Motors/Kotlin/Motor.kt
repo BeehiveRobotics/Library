@@ -15,13 +15,17 @@ class Motor(opMode: BROpMode, name: String): Runnable {
     private var current: Double = 0.0
     var power: Double = 0.0
         get() = this.power
-        private set
+        private set 
     var rawPower: Double = 0.0
         get() = motor.power
     private val name: String = name
-    private val opMode : BROpMode = opMode
-    private val motor : DcMotor = opMode.hardwareMap.get(DcMotor::class.java, name)
+    private val opMode: BROpMode = opMode
+    private val motor: DcMotor = opMode.hardwareMap.get(DcMotor::class.java, name)
+    private var task: Tasks = Tasks.Stop
 
+    enum class Tasks{
+        RunToPosition, Stop
+    }
     init {
         setModel(MotorModel.NEVEREST40)
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE)
@@ -124,24 +128,6 @@ class Motor(opMode: BROpMode, name: String): Runnable {
         return true
     }
 
-    fun setPower(power: Double, current: Double, target: Double) {
-        this.power = power
-        if (!this.opMode.opModeIsActive() || power == 0.0) {
-            stopMotor()
-            return
-        }
-        this.current = current
-        this.target = target
-        val k: Double = 4 / target
-        val calculated_power = k * this.current * (1 - current / target) * power + java.lang.Double.MIN_VALUE
-        val expo_speed = Math.pow(Math.abs(calculated_power), RAMP_LOG_EXPO)
-        if (power < 0) {
-            setRawPower(-expo_speed)
-            return
-        }
-        setRawPower(expo_speed)
-    }
-
     fun stopMotor() {
         this.motor.power = 0.0
     }
@@ -165,14 +151,21 @@ class Motor(opMode: BROpMode, name: String): Runnable {
     }
 
     override fun run() {
-        while (!this.isAtTarget()) {
-            if(!opMode.opModeIsActive()) {
-                return
+        when(this.task) {
+            Tasks.RunToPosition -> {
+                while(!this.isAtTarget()) {
+                    if(!opMode.opModeIsActive()) {
+                        return
+                    }
+                    this.setPower(this.power)
+                }
+                this.stopMotor()
+                Thread.currentThread().interrupt()
             }
-            this.setPower(this.power)
+            Tasks.Stop -> {
+                this.stopMotor()
+            }
         }
-        this.stopMotor()
-        Thread.currentThread().interrupt()
     }
 
     fun sleep(milliseconds: Long) {
