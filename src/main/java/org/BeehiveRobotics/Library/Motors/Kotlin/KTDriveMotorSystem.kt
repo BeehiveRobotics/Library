@@ -2,18 +2,18 @@ package org.BeehiveRobotics.Library.Motors.Kotlin
 
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple
-import org.BeehiveRobotics.Library.Sensors.Kotlin.MRGyro
 import org.BeehiveRobotics.Library.Util.Kotlin.BROpMode
 import com.qualcomm.robotcore.util.ElapsedTime
+import org.BeehiveRobotics.Library.Sensors.Kotlin.REVIMU
 
-abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Runnable {
+abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType): Runnable {
     protected val opMode: BROpMode = opMode
     protected lateinit var FrontLeft: Motor
     protected lateinit var FrontRight: Motor
     protected lateinit var RearLeft: Motor
     protected lateinit var RearRight: Motor
-    protected lateinit var gyro: MRGyro
-    protected var heading: Int = 0
+    protected lateinit var Gyro: REVIMU
+    protected var heading: Double = 0.0
     protected val GYRO_LATENCY_OFFSET: Double = 2.75
     protected val GYRO_SLOW_MODE_OFFSET: Double = 10.0
     protected var CPR: Double = 1120.0
@@ -22,7 +22,7 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
     protected var MIN_SPEED: Double = 0.25
     protected var MAX_SPEED: Double = 1.0
     protected final val GYRO_FINAL_SPEED: Double = 0.2
-    protected var isBusy = false
+    var isBusy = false
     protected var gearedType: GearedType = gearedType
     private var flSpeed: Double = 0.0
     private var frSpeed: Double = 0.0
@@ -46,6 +46,7 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
     }
 
     fun drive(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, inches: Double, waitForCompletion: Boolean = true) {
+        isBusy = true
         this.flSpeed = flSpeed
         this.frSpeed = frSpeed
         this.rlSpeed = rlSpeed
@@ -75,10 +76,12 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
             thread.start()
         }
         stopMotors()
+        isBusy = false
     } 
 
 
-    fun rightGyro(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, target: Double, waitForCompletion: Boolean = true) {
+    internal fun rightGyro(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, target: Double, waitForCompletion: Boolean = true) {
+        isBusy = true
         this.flSpeed = flSpeed
         this.frSpeed = frSpeed
         this.rlSpeed = rlSpeed
@@ -86,12 +89,12 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
         this.target = target
         val adjustedTarget: Double = calculateAdjustedTarget(target, TurnDirection.RIGHT)
         val finalTarget: Double = calculateFinalTarget(target, TurnDirection.RIGHT)
-        this.heading = gyro.getHeading()
-        var derivative: Int = 0
+        this.heading = Gyro.getHeading()
+        var derivative: Double = 0.0
         if(waitForCompletion) {
             setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
-            var current: Int = heading
-            var last: Int = heading
+            var current: Double = heading
+            var last: Double = heading
             while(current < target) {
                 while(derivative <= 180) {
                     if(!opMode.opModeIsActive()) {
@@ -100,11 +103,11 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
                     }
                     derivative = current - last
                     last = current
-                    current = gyro.getHeading()
+                    current = Gyro.getHeading()
                 }
             }
             sleep(100)
-            val start: Int = gyro.getHeading()
+            val start: Double = Gyro.getHeading()
             val distance: Double = adjustedTarget - start
             var proportion: Double
             heading = start
@@ -113,7 +116,7 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
                     stopMotors()
                     return
                 }
-                heading = gyro.getHeading()
+                heading = Gyro.getHeading()
                 proportion = calculateProportion(heading.toDouble(), start.toDouble(), distance)
                 setRawPowers(flSpeed * proportion, frSpeed * proportion, rlSpeed * proportion, rrSpeed * proportion)
             }
@@ -126,7 +129,7 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
                     stopMotors()
                     return
                 }
-                heading = gyro.getHeading()
+                heading = Gyro.getHeading()
                 setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
             }
             stopMotors()
@@ -135,9 +138,12 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
             val thread: Thread = Thread(this)
             thread.start()
         }
+        isBusy = false
+
     }
 
     fun leftGyro(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, target: Double, waitForCompletion: Boolean = true) {
+        isBusy = true
         this.flSpeed = flSpeed
         this.frSpeed = frSpeed
         this.rlSpeed = rlSpeed
@@ -145,12 +151,12 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
         this.target = target
         val adjustedTarget: Double = calculateAdjustedTarget(target, TurnDirection.RIGHT)
         val finalTarget: Double = calculateFinalTarget(target, TurnDirection.RIGHT)
-        this.heading = gyro.getHeading()
-        var derivative: Int = 0
+        this.heading = Gyro.getHeading()
+        var derivative: Double = 0.0
         if(waitForCompletion) {
             setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
-            var current: Int = heading
-            var last: Int = heading
+            var current: Double = heading
+            var last: Double = heading
             while(current > target) {
                 while(derivative >= -180) {
                     if(!opMode.opModeIsActive()) {
@@ -159,11 +165,11 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
                     }
                     derivative = current - last
                     last = current
-                    current = gyro.getHeading()
+                    current = Gyro.getHeading()
                 }
             }
             sleep(100)
-            val start: Int = gyro.getHeading()
+            val start: Double = Gyro.getHeading()
             val distance: Double = adjustedTarget - start
             var proportion: Double
             heading = start
@@ -172,7 +178,7 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
                     stopMotors()
                     return
                 }
-                heading = gyro.getHeading()
+                heading = Gyro.getHeading()
                 proportion = calculateProportion(heading.toDouble(), start.toDouble(), distance)
                 setRawPowers(flSpeed * proportion, frSpeed * proportion, rlSpeed * proportion, rrSpeed * proportion)
             }
@@ -185,7 +191,7 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
                     stopMotors()
                     return
                 }
-                heading = gyro.getHeading()
+                heading = Gyro.getHeading()
                 setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
             }
             stopMotors()
@@ -194,6 +200,7 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
             val thread: Thread = Thread(this)
             thread.start()
         }
+        isBusy = false
     }
 
     fun mapHardware() {
@@ -201,6 +208,7 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
         FrontRight = Motor(opMode, "fr")
         RearLeft = Motor(opMode, "rl")
         RearRight = Motor(opMode, "rr")
+        Gyro = REVIMU(opMode)
     }
 
     fun setMinSpeed(speed: Double): KTDriveMotorSystem {
@@ -239,6 +247,7 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
         setModel(MotorModel.NEVEREST40)
         WheelDiameter = 3.937
         setMinSpeed(MIN_SPEED)
+        Gyro.calibrate()
     }
 
     internal fun resetEncoders(): KTDriveMotorSystem {
@@ -362,13 +371,16 @@ abstract class KTDriveMotorSystem(opMode: BROpMode, gearedType: GearedType) : Ru
         }
         return high
     }
-
     override fun run() {
+        val threadID = Thread.currentThread().id
+        opMode.addData("Multi-Thread ID", threadID.toString())
+        isBusy = true
         when(task) {
             Tasks.EncoderDrive -> drive(flSpeed, frSpeed, rlSpeed, rrSpeed, inches)
             Tasks.RightGyro -> rightGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target)
             Tasks.LeftGyro -> leftGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target)
-            Twasks.Stop -> stopMotors()
+            Tasks.Stop -> stopMotors()
         }
+        isBusy = false
     }
 } 

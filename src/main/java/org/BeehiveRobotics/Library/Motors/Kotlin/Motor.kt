@@ -57,7 +57,6 @@ class Motor(opMode: BROpMode, name: String): Runnable {
         this.setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
         this.setRunMode(initialBehavior)
         this.current = 0.0
-        this.target = 0.0
         return this
     }
 

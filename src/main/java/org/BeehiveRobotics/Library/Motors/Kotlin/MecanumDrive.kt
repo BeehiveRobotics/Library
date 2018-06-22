@@ -37,6 +37,13 @@ class MecanumDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType =
         val rrSpeed: Double = clip(y - z + x)
         super.rightGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target, waitForCompletion)
     }
+    fun rightGyro(speed: Double, target: Double, waitForCompletion: Boolean = true) {
+        val flSpeed: Double = Math.abs(speed)
+        val frSpeed: Double = -Math.abs(speed)
+        val rlSpeed: Double = Math.abs(speed)
+        val rrSpeed: Double = -Math.abs(speed)
+        super.rightGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target, waitForCompletion)
+    }
 
     fun leftGyro(x: Double, y: Double, z: Double, target: Double, waitForCompletion: Boolean = true) {
         val flSpeed: Double = clip(y + z + x)
@@ -45,6 +52,14 @@ class MecanumDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType =
         val rrSpeed: Double = clip(y - z + x)
         super.leftGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target, waitForCompletion)
     }
+    fun leftGyro(speed: Double, target: Double, waitForCompletion: Boolean = true) {
+        val flSpeed: Double = -Math.abs(speed)
+        val frSpeed: Double = Math.abs(speed)
+        val rlSpeed: Double = -Math.abs(speed)
+        val rrSpeed: Double = Math.abs(speed)
+        super.rightGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target, waitForCompletion)
+    }
+
 
     fun forward(speed: Double, inches: Double, waitForCompletion: Boolean = true) {
         this.drive(0.0, Math.abs(speed), 0.0, inches, waitForCompletion)

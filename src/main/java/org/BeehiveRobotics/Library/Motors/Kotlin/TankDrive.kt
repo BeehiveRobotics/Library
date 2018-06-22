@@ -124,4 +124,4 @@ class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType = Ge
         drive(0.0, speed)
     }
 }
-//TODO: Add actual DriveState stuff into gyro turning to allow for gyro turning to be on different thread.
+//TODO: Add actual DriveState stuff into Gyro turning to allow for Gyro turning to be on different thread.

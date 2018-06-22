@@ -17,16 +17,20 @@ class MecanumRobot constructor(opMode: BROpMode) {
         drive.stopMotors()
     }
 
-    //companion object {
-        fun sleep(milliseconds: Long) {
-            val time: ElapsedTime = ElapsedTime()
-            time.reset()
-            while(time.milliseconds() < milliseconds) {
-                if(!(opMode.opModeIsActive())) {
-                    return
-                }
+    fun sleep(milliseconds: Long) {
+        val time: ElapsedTime = ElapsedTime()
+        time.reset()
+        while(time.milliseconds() < milliseconds) {
+            if(!(opMode.opModeIsActive())) {
+                return
             }
         }
-    //}
-
+    }
+    fun waitUntilNotBusy() {
+        while(drive.isBusy) {
+            if(!opMode.opModeIsActive()) {
+                return
+            }
+        }
+    }
 }

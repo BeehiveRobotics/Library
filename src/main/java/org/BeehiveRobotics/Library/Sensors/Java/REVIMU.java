@@ -1,4 +1,4 @@
-package org.BeehiveRobotics.Library.Sensors;
+package org.BeehiveRobotics.Library.Sensors.Java;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -47,7 +47,7 @@ public class REVIMU {
     }
 
     public BNO055IMU getIMU() {
-	    return this.imu;
+        return this.imu;
     }
 
 
