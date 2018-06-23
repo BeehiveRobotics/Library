@@ -1,4 +1,4 @@
-package org.BeehiveRobotics.Library.Motors.Kotlin
+package org.BeehiveRobotics.Library.Robots.Kotlin
 
 import org.BeehiveRobotics.Library.Motors.Kotlin.TankDrive
 import org.BeehiveRobotics.Library.Util.Kotlin.BROpMode
@@ -23,5 +23,13 @@ class TankRobot(opMode: BROpMode) {
             }
         }
     }
+    fun waitUntilNotBusy() {
+        while(drive.isBusy) {
+            if(!opMode.opModeIsActive()) {
+                return
+            }
+        }
+    }
+
 
 }

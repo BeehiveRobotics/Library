@@ -1,8 +1,9 @@
-package org.BeehiveRobotics.Library.Motors.Kotlin
+package org.BeehiveRobotics.Library.Robots.Kotlin
 
 import com.qualcomm.robotcore.hardware.DcMotor
 import org.BeehiveRobotics.Library.Util.Kotlin.BROpMode
 import com.qualcomm.robotcore.util.ElapsedTime
+import org.BeehiveRobotics.Library.Motors.Kotlin.MecanumDrive
 
 class MecanumRobot constructor(opMode: BROpMode) {
     val opMode: BROpMode = opMode
