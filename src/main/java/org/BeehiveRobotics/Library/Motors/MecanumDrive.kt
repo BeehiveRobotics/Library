@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.util.Range
 
 @Suppress("NAME_SHADOWING")
 
-class MecanumDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType = GearedType.NORMAL): Runnable, KTDriveMotorSystem(opMode, gearedType) {
+class MecanumDrive(opMode: BROpMode, gearedType: DriveMotorSystem.GearedType = GearedType.NORMAL): Runnable, DriveMotorSystem(opMode, gearedType) {
     fun drive(x: Double, y: Double, z: Double, inches: Double, waitForCompletion: Boolean = true) {
         val flSpeed: Double = clip(y + z + x)
         val frSpeed: Double = clip(y - z - x)

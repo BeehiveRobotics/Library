@@ -3,7 +3,7 @@ package org.BeehiveRobotics.Library.Motors
 import org.BeehiveRobotics.Library.Util.BROpMode
 
 @Suppress("NAME_SHADOWING")
-class TankDrive(opMode: BROpMode, gearedType: KTDriveMotorSystem.GearedType = GearedType.NORMAL) : Runnable, KTDriveMotorSystem(opMode, gearedType) {
+class TankDrive(opMode: BROpMode, gearedType: DriveMotorSystem.GearedType = GearedType.NORMAL) : Runnable, DriveMotorSystem(opMode, gearedType) {
 
     fun drive(left: Double, right: Double, inches: Double, waitForCompletion: Boolean = true) {
         super.drive(left, right, left, right, inches, waitForCompletion)
