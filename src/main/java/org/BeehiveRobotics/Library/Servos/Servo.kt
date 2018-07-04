@@ -16,22 +16,23 @@ class Servo(private val opMode: BROpMode, val name: String): Runnable {
         thread.start()
     }
 
-    fun setRange(degrees: Double) {
+    fun setDirection(direction: com.qualcomm.robotcore.hardware.Servo.Direction): org.BeehiveRobotics.Library.Servos.Servo {
+        servo.setDirection(direction)
+        return this
+    }
+
+    fun setSpeed(speed: Double): org.BeehiveRobotics.Library.Servos.Servo {
+        this.servoSpeed = Math.abs(Range.clip(Math.abs(speed), 0.0, 1.0))
+        return this
+    }
+
+    fun setRange(degrees: Double): org.BeehiveRobotics.Library.Servos.Servo {
         this.rangeOfMotion = degrees
+        return this
     }
     
     fun setPosition(position: Double) {
         this.servoPosition = position
-        servo.setPosition(position)
-    }
-    
-    fun setSpeed(speed: Double) {
-        this.servoSpeed = Math.abs(Range.clip(Math.abs(speed), 0.0, 1.0))
-    }
-
-    fun setDirection(direction: Servo.Direction): org.BeehiveRobotics.Library.Servos.Servo {
-        servo.setDirection(direction)
-        return this
     }
     
     fun getPosition(): Double {
