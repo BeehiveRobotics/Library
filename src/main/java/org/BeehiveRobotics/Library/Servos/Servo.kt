@@ -12,6 +12,10 @@ class Servo(private val opMode: BROpMode, val name: String): Runnable {
     private var rangeOfMotion: Double = 180.0
     private var thread: Thread = Thread(this)
 
+    enum class ServoModel(val RPM: Double) {
+        REV(60.0) // TODO: TEST THIS NUMBER. THIS IS JUST A FILLER FOR NOW
+    }
+
     init {
         thread.start()
     }
@@ -22,7 +26,7 @@ class Servo(private val opMode: BROpMode, val name: String): Runnable {
     }
 
     fun setSpeed(speed: Double): org.BeehiveRobotics.Library.Servos.Servo {
-        this.servoSpeed = Math.abs(Range.clip(Math.abs(speed), 0.0, 1.0))
+        this.servoSpeed = Range.clip(Math.abs(speed), 0.0, 1.0)
         return this
     }
 
@@ -51,3 +55,4 @@ class Servo(private val opMode: BROpMode, val name: String): Runnable {
         }
     }
 }
+//TODO: Servo speed managing

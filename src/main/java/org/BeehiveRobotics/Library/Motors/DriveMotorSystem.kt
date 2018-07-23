@@ -18,7 +18,7 @@ abstract class DriveMotorSystem(opMode: BROpMode, gearedType: GearedType): Runna
     protected val GYRO_SLOW_MODE_OFFSET: Double = 10.0
     protected var CPR: Double = 1120.0
     protected var WheelDiameter: Double = 0.0
-    protected lateinit var model: MotorModel
+    protected lateinit var model: Motor.MotorModel
     protected var MIN_SPEED: Double = 0.25
     protected var MAX_SPEED: Double = 1.0
     protected final val GYRO_FINAL_SPEED: Double = 0.2
@@ -244,7 +244,7 @@ abstract class DriveMotorSystem(opMode: BROpMode, gearedType: GearedType): Runna
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE)
         setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
         resetEncoders()
-        setModel(MotorModel.NEVEREST40)
+        setModel(Motor.MotorModel.NEVEREST40)
         WheelDiameter = 3.937
         setMinSpeed(MIN_SPEED)
         Gyro.calibrate()
@@ -279,7 +279,7 @@ abstract class DriveMotorSystem(opMode: BROpMode, gearedType: GearedType): Runna
         return this
     }
 
-    protected fun setModel(model: MotorModel): DriveMotorSystem {
+    protected fun setModel(model: Motor.MotorModel): DriveMotorSystem {
         FrontLeft.setModel(model)
         FrontRight.setModel(model)
         RearLeft.setModel(model)

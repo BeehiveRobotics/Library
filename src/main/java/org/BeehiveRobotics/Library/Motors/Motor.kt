@@ -21,9 +21,16 @@ class Motor(opMode: BROpMode, name: String): Runnable {
     private val motor: DcMotor = opMode.hardwareMap.get(DcMotor::class.java, name)
     private var task: Tasks = Tasks.Stop
 
+    enum class MotorModel(val CPR: Double) {
+        NEVEREST20(537.6), 
+        NEVEREST40(1120.0), 
+        NEVEREST60(1680.0)
+    }
+
     enum class Tasks{
         RunToPosition, Stop
     }
+    
     init {
         setModel(MotorModel.NEVEREST40)
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE)
