@@ -6,8 +6,7 @@ import org.BeehiveRobotics.Library.Util.BROpMode
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.BeehiveRobotics.Library.Sensors.REVIMU
 
-abstract class DriveMotorSystem(opMode: BROpMode, gearedType: GearedType): Runnable {
-    protected val opMode: BROpMode = opMode
+abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var gearedType: GearedType): Runnable {
     protected lateinit var FrontLeft: Motor
     protected lateinit var FrontRight: Motor
     protected lateinit var RearLeft: Motor
@@ -18,12 +17,11 @@ abstract class DriveMotorSystem(opMode: BROpMode, gearedType: GearedType): Runna
     protected val GYRO_SLOW_MODE_OFFSET: Double = 10.0
     protected var CPR: Double = 1120.0
     protected var WheelDiameter: Double = 0.0
-    protected lateinit var model: Motor.MotorModel
+    protected  var model: Motor.MotorModel = Motor.MotorModel.NEVEREST40
     protected var MIN_SPEED: Double = 0.25
     protected var MAX_SPEED: Double = 1.0
     protected final val GYRO_FINAL_SPEED: Double = 0.2
     var isBusy: Boolean = true
-    protected var gearedType: GearedType = gearedType
     private var flSpeed: Double = 0.0
     private var frSpeed: Double = 0.0
     private var rlSpeed: Double = 0.0
@@ -320,11 +318,17 @@ abstract class DriveMotorSystem(opMode: BROpMode, gearedType: GearedType): Runna
 
     }
 
-    fun stopMotors() {
-        FrontLeft.stopMotor()
-        FrontRight.stopMotor()
-        RearLeft.stopMotor()
-        RearRight.stopMotor()
+    fun stopMotors(waitForCompletion: Boolean = true) {
+        if(waitForCompletion) {
+            FrontLeft.stopMotor()
+            FrontRight.stopMotor()
+            RearLeft.stopMotor()
+            RearRight.stopMotor()
+        } else {
+            this.task = Tasks.Stop
+            val thread: Thread = Thread(this)
+            thread.start()
+        }
     }
 
     fun sleep(milliseconds: Long) {
@@ -372,8 +376,6 @@ abstract class DriveMotorSystem(opMode: BROpMode, gearedType: GearedType): Runna
         return high
     }
     override fun run() {
-        val threadID = Thread.currentThread().id
-        opMode.addData("Multi-Thread ID", threadID.toString())
         isBusy = true
         when(task) {
             Tasks.EncoderDrive -> drive(flSpeed, frSpeed, rlSpeed, rrSpeed, inches, true)
