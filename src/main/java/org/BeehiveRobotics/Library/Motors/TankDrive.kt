@@ -5,28 +5,14 @@ import org.BeehiveRobotics.Library.Util.BROpMode
 @Suppress("NAME_SHADOWING")
 class TankDrive(opMode: BROpMode, gearedType: DriveMotorSystem.GearedType = GearedType.NORMAL) : Runnable, DriveMotorSystem(opMode, gearedType) {
 
-    fun drive(left: Double, right: Double, inches: Double, waitForCompletion: Boolean = true) {
-        super.drive(left, right, left, right, inches, waitForCompletion)
-    }
+    fun drive(left: Double, right: Double, inches: Double, waitForCompletion: Boolean = true) = super.drive(left, right, left, right, inches, waitForCompletion)
+    fun drive(left: Double, right: Double) = setRawPowers(left, right, left, right)
 
-    fun drive(left: Double, right: Double) {
-        setRawPowers(left, right, left, right)
-    }
+    fun rightGyro(leftSpeed: Double, rightSpeed: Double, target: Double, waitForCompletion: Boolean = true) = super.rightGyro(leftSpeed, rightSpeed, leftSpeed, rightSpeed, target, waitForCompletion)
+    fun rightGyro(speed: Double, target: Double) = rightGyro(Math.abs(speed), -Math.abs(speed), target)
 
-    fun rightGyro(leftSpeed: Double, rightSpeed: Double, target: Double, waitForCompletion: Boolean = true) {
-        super.rightGyro(leftSpeed, rightSpeed, leftSpeed, rightSpeed, target, waitForCompletion)
-    }
-
-    fun rightGyro(speed: Double, target: Double) {
-        rightGyro(Math.abs(speed), -Math.abs(speed), target)
-    }
-
-    fun leftGyro(leftSpeed: Double, rightSpeed: Double, target: Double, waitForCompletion: Boolean = true) {
-        super.leftGyro(leftSpeed, rightSpeed, leftSpeed, rightSpeed, target, waitForCompletion)
-    }
-    fun leftGyro(speed: Double, target: Double) {
-        leftGyro(-Math.abs(speed), Math.abs(speed), target)
-    }
+    fun leftGyro(leftSpeed: Double, rightSpeed: Double, target: Double, waitForCompletion: Boolean = true) = super.leftGyro(leftSpeed, rightSpeed, leftSpeed, rightSpeed, target, waitForCompletion)
+    fun leftGyro(speed: Double, target: Double) = leftGyro(-Math.abs(speed), Math.abs(speed), target)
 
     fun forward(speed: Double, inches: Double, waitForCompletion: Boolean = true) {
         var speed: Double = speed
@@ -124,4 +110,3 @@ class TankDrive(opMode: BROpMode, gearedType: DriveMotorSystem.GearedType = Gear
         drive(0.0, speed)
     }
 }
-//TODO: Add actual DriveState stuff into Gyro turning to allow for Gyro turning to be on different thread.

@@ -6,20 +6,41 @@ import com.qualcomm.robotcore.util.Range
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.BeehiveRobotics.Library.Util.BROpMode
 
-class Motor(opMode: BROpMode, name: String): Runnable {
+class Motor(val opMode: BROpMode, val name: String): Runnable {
     private val RAMP_LOG_EXPO = 0.8
-    private var MIN_SPEED = 0.2
-    private var MAX_SPEED = 1.0
-    private var model: MotorModel = MotorModel.NEVEREST40
-    private var target: Double = 0.0
+    var MIN_SPEED = 0.2
+        set(speed) {
+            this.MIN_SPEED = Math.abs(speed)
+        }
+    var MAX_SPEED = 1.0
+        set(speed) {
+            this.MAX_SPEED = Math.abs(speed)
+        }
+    var target: Double = 0.0
+        set(target) {
+            resetEncoder()
+            this.current = currentPosition
+            this.target = Math.abs(target)
+        }
     private var current: Double = 0.0
     var power: Double = 0.0
-        get() = this.power
         private set 
-    private val name: String = name
-    private val opMode: BROpMode = opMode
     private val motor: DcMotor = opMode.hardwareMap.get(DcMotor::class.java, name)
     private var task: Tasks = Tasks.Stop
+    var runMode: DcMotor.RunMode
+        set(runMode) {
+            this.motor.mode = runMode
+        }
+        get() = this.motor.mode
+    var model = MotorModel.NEVEREST40
+    var currentPosition = 0.0
+        private set
+        get() = this.motor.currentPosition.toDouble()
+    var zeroPowerBehavior: DcMotor.ZeroPowerBehavior
+        set(zeroPowerBehavior) {
+            this.motor.zeroPowerBehavior = zeroPowerBehavior
+        }
+        get() = this.motor.zeroPowerBehavior
 
     enum class MotorModel(val CPR: Double) {
         NEVEREST20(537.6), 
@@ -32,52 +53,22 @@ class Motor(opMode: BROpMode, name: String): Runnable {
     }
     
     init {
-        setModel(MotorModel.NEVEREST40)
+        this.model = (MotorModel.NEVEREST40)
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE)
         resetEncoder()
     }
 
-    internal fun setRunMode(runMode: DcMotor.RunMode): Motor {
-        this.motor.mode = runMode
-        return this
-    }
-
-    fun setModel(motorModel: MotorModel): Motor {
-        this.model = motorModel
-        return this
-    }
-
-    internal fun setMinSpeed(speed: Double): Motor {
-        this.MIN_SPEED = Math.abs(speed)
-        return this
-    }
-
-    fun setMaxSpeed(speed: Double): Motor {
-        this.MAX_SPEED = Math.abs(speed)
-        return this
-    }
-
     internal fun resetEncoder(): Motor {
-        val initialBehavior: DcMotor.RunMode = this.getRunMode()
-        this.setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
-        this.setRunMode(initialBehavior)
+        val initialBehavior = this.runMode
+        this.runMode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+        this.runMode = initialBehavior
         this.current = 0.0
         return this
-    }
-
-    internal fun getCurrentPosition(): Double {
-        return this.motor.currentPosition.toDouble()
     }
 
     internal fun setZeroPowerBehavior(zeroPowerBehavior: DcMotor.ZeroPowerBehavior): Motor {
         this.motor.zeroPowerBehavior = zeroPowerBehavior
         return this
-    }
-
-    fun setTarget(target: Double) {
-        resetEncoder()
-        this.current = getCurrentPosition()
-        this.target = Math.abs(target)
     }
 
     internal fun runToTarget(target: Double, power: Double, waitForStop: Boolean) {
@@ -123,7 +114,7 @@ class Motor(opMode: BROpMode, name: String): Runnable {
             stopMotor()
             return false
         }
-        this.current = Math.abs(getCurrentPosition())
+        this.current = Math.abs(currentPosition)
         val k: Double = 4.0 / target
         val calculated_power: Double = k * this.current * (1 - (this.current / this.target)) * power + java.lang.Double.MIN_VALUE
         val expo_speed: Double = Math.pow(Math.abs(calculated_power), RAMP_LOG_EXPO)

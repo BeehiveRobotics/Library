@@ -13,13 +13,38 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
     protected lateinit var RearRight: Motor
     protected lateinit var Gyro: REVIMU
     protected var heading: Double = 0.0
+        get() = Gyro.getHeading()
+        private set
     protected val GYRO_LATENCY_OFFSET: Double = 2.75
     protected val GYRO_SLOW_MODE_OFFSET: Double = 10.0
     protected var CPR: Double = 1120.0
-    protected var WheelDiameter: Double = 0.0
-    protected  var model: Motor.MotorModel = Motor.MotorModel.NEVEREST40
+        private set
+    protected var model: Motor.MotorModel = Motor.MotorModel.NEVEREST40
+        protected set(model: Motor.MotorModel) {
+            FrontLeft.model = model
+            FrontRight.model = model
+            RearLeft.model = model
+            RearRight.model = model
+            this.model = model
+            this.CPR = model.CPR
+    }
     protected var MIN_SPEED: Double = 0.25
+        protected set(speed) {        
+            this.MIN_SPEED = speed
+            FrontLeft.MIN_SPEED = MIN_SPEED
+            FrontRight.MIN_SPEED = MIN_SPEED
+            RearLeft.MIN_SPEED = MIN_SPEED
+            RearRight.MIN_SPEED = MIN_SPEED
+        }
     protected var MAX_SPEED: Double = 1.0
+        protected set(speed) {
+            this.MAX_SPEED = speed
+            FrontLeft.MAX_SPEED = MAX_SPEED
+            FrontRight.MAX_SPEED = MAX_SPEED
+            RearLeft.MAX_SPEED = MAX_SPEED
+            RearRight.MAX_SPEED = MAX_SPEED
+        }
+    protected var WheelDiameter: Double = 3.937
     protected final val GYRO_FINAL_SPEED: Double = 0.2
     var isBusy: Boolean = true
     private var flSpeed: Double = 0.0
@@ -36,14 +61,14 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         NORMAL, REVERSE
     }
 
-    enum class TurnDirection {
+    protected enum class TurnDirection {
         LEFT, RIGHT
     }
-    enum class Tasks {
+    private enum class Tasks {
         EncoderDrive, RightGyro, LeftGyro, Stop
     }
 
-    fun drive(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, inches: Double, waitForCompletion: Boolean = true) {
+    protected fun drive(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, inches: Double, waitForCompletion: Boolean = true) {
         isBusy = true
         this.flSpeed = flSpeed
         this.frSpeed = frSpeed
@@ -52,9 +77,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         this.inches = inches
         resetEncoders()
         val clicks: Double = inches_to_clicks(inches)
-        val powerList: DoubleArray = DoubleArray(4)
-        powerList[0] = flSpeed; powerList[1] = frSpeed; powerList[2] = rlSpeed; powerList[3] = rrSpeed
-        val highestPower: Double = findHighestPower(powerList)
+        val highestPower: Double = findHighestPower(listOf(flSpeed, frSpeed, rlSpeed, rrSpeed))
         val flTarget: Double = clicks * flSpeed /  highestPower
         val frTarget: Double = clicks * frSpeed / highestPower
         val rlTarget: Double = clicks * rlSpeed / highestPower
@@ -78,7 +101,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
     } 
 
 
-    internal fun rightGyro(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, target: Double, waitForCompletion: Boolean = true) {
+    protected fun rightGyro(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, target: Double, waitForCompletion: Boolean = true) {
         isBusy = true
         this.flSpeed = flSpeed
         this.frSpeed = frSpeed
@@ -140,7 +163,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         }
     }
 
-    fun leftGyro(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, target: Double, waitForCompletion: Boolean = true) {
+    protected fun leftGyro(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, target: Double, waitForCompletion: Boolean = true) {
         isBusy = true
         this.flSpeed = flSpeed
         this.frSpeed = frSpeed
@@ -209,24 +232,6 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         Gyro = REVIMU(opMode)
     }
 
-    fun setMinSpeed(speed: Double): DriveMotorSystem {
-        this.MIN_SPEED = speed
-        FrontLeft.setMinSpeed(MIN_SPEED)
-        FrontRight.setMinSpeed(MIN_SPEED)
-        RearLeft.setMinSpeed(MIN_SPEED)
-        RearRight.setMinSpeed(MIN_SPEED)
-        return this
-    }
-
-    fun setMaxSpeed(speed: Double): DriveMotorSystem {
-        this.MAX_SPEED = speed
-        FrontLeft.setMaxSpeed(MAX_SPEED)
-        FrontRight.setMaxSpeed(MAX_SPEED)
-        RearLeft.setMaxSpeed(MAX_SPEED)
-        RearRight.setMaxSpeed(MAX_SPEED)
-        return this
-    }
-
     fun init() {
         if (gearedType == GearedType.NORMAL) {
             FrontLeft.setDirection(DcMotorSimple.Direction.REVERSE)
@@ -242,13 +247,11 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE)
         setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
         resetEncoders()
-        setModel(Motor.MotorModel.NEVEREST40)
-        WheelDiameter = 3.937
-        setMinSpeed(MIN_SPEED)
+        this.model = model
         Gyro.calibrate()
     }
 
-    internal fun resetEncoders(): DriveMotorSystem {
+    protected fun resetEncoders(): DriveMotorSystem {
         FrontLeft.resetEncoder()
         FrontRight.resetEncoder()
         RearLeft.resetEncoder()
@@ -265,29 +268,19 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
     }
 
     protected fun setRunMode(runMode: DcMotor.RunMode): DriveMotorSystem {
-        FrontLeft.setRunMode(runMode)
-        FrontRight.setRunMode(runMode)
-        RearLeft.setRunMode(runMode)
-        RearRight.setRunMode(runMode)
+        FrontLeft.runMode = runMode
+        FrontRight.runMode = runMode
+        RearLeft.runMode = runMode
+        RearRight.runMode = runMode
         return this
     }
 
-    fun setGearedType(gearedType: GearedType): DriveMotorSystem {
+    protected fun setGearedType(gearedType: GearedType): DriveMotorSystem {
         this.gearedType = gearedType
         return this
     }
 
-    protected fun setModel(model: Motor.MotorModel): DriveMotorSystem {
-        FrontLeft.setModel(model)
-        FrontRight.setModel(model)
-        RearLeft.setModel(model)
-        RearRight.setModel(model)
-        this.model = model
-        this.CPR = model.CPR
-        return this
-    }
-
-    internal fun allMotorsAtTarget(): Boolean {
+    protected fun allMotorsAtTarget(): Boolean {
         return FrontLeft.isAtTarget() && FrontRight.isAtTarget() && RearLeft.isAtTarget() && RearRight.isAtTarget()
     }
 
@@ -306,10 +299,10 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
     }
 
     internal fun setTargets(fl: Double, fr: Double, rl: Double, rr: Double) {
-        FrontLeft.setTarget(fl)
-        FrontRight.setTarget(fr)
-        RearLeft.setTarget(rl)
-        RearRight.setTarget(rr)
+        FrontLeft.target = fl
+        FrontRight.target = fr
+        RearLeft.target = rl
+        RearRight.target = rr
     }
 
     internal fun inches_to_clicks(inches: Double): Double {
@@ -342,33 +335,31 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
 
     }
 
-    fun avgSpeed(): Double {
-        return (Math.abs(FrontLeft.power) + Math.abs(FrontRight.power) + Math.abs(RearLeft.power) + Math.abs(RearRight.power)) / 4
-    }
+    fun avgSpeed() = (Math.abs(FrontLeft.power) + Math.abs(FrontRight.power) + Math.abs(RearLeft.power) + Math.abs(RearRight.power)) / 4
 
-    internal fun calculateAdjustedTarget(target: Double, direction: TurnDirection): Double {
+    protected fun calculateAdjustedTarget(target: Double, direction: TurnDirection): Double {
         when(direction) {
             TurnDirection.LEFT -> return target - GYRO_LATENCY_OFFSET - GYRO_SLOW_MODE_OFFSET
             TurnDirection.RIGHT -> return target + GYRO_LATENCY_OFFSET + GYRO_SLOW_MODE_OFFSET
         }
     }
 
-    internal fun calculateFinalTarget(target: Double, direction: TurnDirection): Double {
+    protected fun calculateFinalTarget(target: Double, direction: TurnDirection): Double {
         when(direction) {
             TurnDirection.LEFT -> return target - GYRO_LATENCY_OFFSET
             TurnDirection.RIGHT -> return target + GYRO_LATENCY_OFFSET
         }
     }
 
-    internal fun calculateProportion(current: Double, start: Double, distance: Double): Double {
+    protected fun calculateProportion(current: Double, start: Double, distance: Double): Double {
         val remaining = current - start
         val proportion = (1 - (Math.abs((remaining) / distance))) * 0.75 + 0.25
         return proportion
     }
 
-    private fun findHighestPower(values: DoubleArray): Double {
+    private fun findHighestPower(powers: List<Double>): Double {
         var high: Double = Double.MIN_VALUE
-        for (value: Double in values) {
+        for (value in powers) {
             if(Math.abs(value) > high){
                 high = Math.abs(value)
             }
