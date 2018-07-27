@@ -14,93 +14,39 @@ class Controller(val gamepad: Gamepad) {
     private var dpad_leftPrev = false
     private var dpad_rightPrev = false
 
-    fun leftStickX(): Double {
-        return gamepad.left_stick_x.toDouble()
-    }
+    fun leftStickX(): Double = gamepad.left_stick_x.toDouble()
+    fun leftStickY(): Double = (-gamepad.left_stick_y).toDouble()
+    fun rightStickX(): Double = gamepad.right_stick_x.toDouble()
+    fun rightStickY(): Double = (-gamepad.right_stick_y).toDouble()
 
-    fun leftStickY(): Double {
-        return (-gamepad.left_stick_y).toDouble()
-    }
+    fun leftTrigger(): Double = gamepad.left_trigger.toDouble()
+    fun rightTrigger(): Double = gamepad.right_trigger.toDouble()
 
-    fun rightStickX(): Double {
-        return gamepad.right_stick_x.toDouble()
-    }
+    fun leftBumper(): Boolean = gamepad.left_bumper
+    fun rightBumper(): Boolean = gamepad.right_bumper
 
-    fun rightStickY(): Double {
-        return (-gamepad.right_stick_y).toDouble()
-    }
+    fun dpad_up(): Boolean = gamepad.dpad_up
+    fun dpad_down(): Boolean = gamepad.dpad_down
+    fun dpad_left(): Boolean = gamepad.dpad_left
+    fun dpad_right(): Boolean = gamepad.dpad_right
 
-    fun leftTrigger(): Double {
-        return gamepad.left_trigger.toDouble()
-    }
+    fun a(): Boolean = gamepad.a
+    fun b(): Boolean = gamepad.b
+    fun x(): Boolean = gamepad.x
+    fun y(): Boolean = gamepad.y
 
-    fun rightTrigger(): Double {
-        return gamepad.right_trigger.toDouble()
-    }
+    fun aToggle(): Boolean = a() && !aPrev
+    fun bToggle(): Boolean = b() && !bPrev
+    fun xToggle(): Boolean = x() && !xPrev
+    fun yToggle(): Boolean = y() && !yPrev
 
-    fun leftBumper(): Boolean {
-        return gamepad.left_bumper
-    }
+    fun leftBumperToggle(): Boolean = leftBumper() && !leftBumperPrev
+    fun rightBumperToggle(): Boolean = rightBumper() && !rightBumperPrev
 
-    fun rightBumper(): Boolean {
-        return gamepad.right_bumper
-    }
-
-    fun dpad_up(): Boolean {
-        return gamepad.dpad_up
-    }
-
-    fun dpad_down(): Boolean {
-        return gamepad.dpad_down
-    }
-
-    fun dpad_left(): Boolean {
-        return gamepad.dpad_left
-    }
-
-    fun dpad_right(): Boolean {
-        return gamepad.dpad_right
-    }
-
-    fun a(): Boolean {
-        return gamepad.a
-    }
-
-    fun b(): Boolean {
-        return gamepad.b
-    }
-
-    fun x(): Boolean {
-        return gamepad.x
-    }
-
-    fun y(): Boolean {
-        return gamepad.y
-    }
-
-    fun aToggle(): Boolean {
-        return a() && !aPrev
-    }
-
-    fun bToggle(): Boolean {
-        return b() && !bPrev
-    }
-
-    fun xToggle(): Boolean {
-        return x() && !xPrev
-    }
-
-    fun yToggle(): Boolean {
-        return y() && !yPrev
-    }
-
-    fun leftBumperToggle(): Boolean {
-        return leftBumper() && !leftBumperPrev
-    }
-
-    fun rightBumperToggle(): Boolean {
-        return rightBumper() && !rightBumperPrev
-    }
+    fun dpad_upToggle(): Boolean = dpad_up() && !dpad_upPrev
+    fun dpad_downToggle(): Boolean = dpad_down() && !dpad_downPrev
+    fun dpad_leftToggle(): Boolean = dpad_left() && !dpad_leftPrev
+    fun dpad_rightToggle(): Boolean = dpad_right() && !dpad_rightPrev
 
     fun update() {
         aPrev = a()

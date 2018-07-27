@@ -1,5 +1,6 @@
-package org.BeehiveRobotics.Library.Motors
+package org.BeehiveRobotics.Library.Systems
 
+import org.BeehiveRobotics.Library.Motors.Motor
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import org.BeehiveRobotics.Library.Util.BROpMode
@@ -44,6 +45,25 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
             RearLeft.MAX_SPEED = MAX_SPEED
             RearRight.MAX_SPEED = MAX_SPEED
         }
+    var zeroPowerBehavior: DcMotor.ZeroPowerBehavior
+        set(zeroPowerBehavior) {
+            this.zeroPowerBehavior = zeroPowerBehavior
+            this.FrontLeft.zeroPowerBehavior = zeroPowerBehavior
+            this.FrontRight.zeroPowerBehavior = zeroPowerBehavior
+            this.RearLeft.zeroPowerBehavior = zeroPowerBehavior
+            this.RearRight.zeroPowerBehavior = zeroPowerBehavior
+        }
+        get() = this.zeroPowerBehavior
+    protected var runMode: DcMotor.RunMode
+        set (runMode) {
+            this.runMode = runMode
+            FrontLeft.runMode = runMode
+            FrontRight.runMode = runMode
+            RearLeft.runMode = runMode
+            RearRight.runMode = runMode
+        }
+        get() = this.runMode
+
     protected var WheelDiameter: Double = 3.937
     protected final val GYRO_FINAL_SPEED: Double = 0.2
     var isBusy: Boolean = true
@@ -244,8 +264,8 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
             FrontLeft.setDirection(DcMotorSimple.Direction.FORWARD)
             RearLeft.setDirection(DcMotorSimple.Direction.FORWARD)
         }
-        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE)
-        setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
+        this.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+        this.runMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
         resetEncoders()
         this.model = model
         Gyro.calibrate()

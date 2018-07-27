@@ -1,7 +1,7 @@
 package org.BeehiveRobotics.Library.Robots
 
 import com.qualcomm.robotcore.hardware.DcMotor
-import org.BeehiveRobotics.Library.Motors.TankDrive
+import org.BeehiveRobotics.Library.Systems.TankDrive
 import org.BeehiveRobotics.Library.Util.BROpMode
 
 class TankRobot(opMode: BROpMode) {
@@ -9,7 +9,7 @@ class TankRobot(opMode: BROpMode) {
     lateinit var drive: TankDrive
     fun init() {
         drive = TankDrive(opMode)
-        drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE)
+        drive.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
     }
 
     fun stop() {

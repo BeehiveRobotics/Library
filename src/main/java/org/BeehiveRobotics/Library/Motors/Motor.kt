@@ -5,8 +5,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.util.Range
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.BeehiveRobotics.Library.Util.BROpMode
+import org.BeehiveRobotics.Library.Systems.RobotSystem
 
-class Motor(val opMode: BROpMode, val name: String): Runnable {
+class Motor(val opMode: BROpMode, val name: String): RobotSystem(opMode) {
     private val RAMP_LOG_EXPO = 0.8
     var MIN_SPEED = 0.2
         set(speed) {
@@ -53,8 +54,8 @@ class Motor(val opMode: BROpMode, val name: String): Runnable {
     }
     
     init {
-        this.model = (MotorModel.NEVEREST40)
-        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE)
+        this.model = MotorModel.NEVEREST40
+        this.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
         resetEncoder()
     }
 
@@ -72,6 +73,7 @@ class Motor(val opMode: BROpMode, val name: String): Runnable {
     }
 
     internal fun runToTarget(target: Double, power: Double, waitForStop: Boolean) {
+        isBusy = true
         this.target = Math.abs(target)
         this.power = power
         if (!waitForStop) {
@@ -85,6 +87,7 @@ class Motor(val opMode: BROpMode, val name: String): Runnable {
                 setPower(power)
             }
         }
+        isBusy = false
     }
 
     internal fun runToTarget(target: Double, power: Double) {
@@ -149,6 +152,7 @@ class Motor(val opMode: BROpMode, val name: String): Runnable {
     }
 
     override fun run() {
+        isBusy = true
         when(this.task) {
             Tasks.RunToPosition -> {
                 while(!this.isAtTarget()) {
@@ -164,17 +168,6 @@ class Motor(val opMode: BROpMode, val name: String): Runnable {
                 this.stopMotor()
             }
         }
+        isBusy = false
     }
-
-    fun sleep(milliseconds: Long) {
-        val time: ElapsedTime = ElapsedTime()
-        time.reset()
-        while(time.milliseconds() < milliseconds) {
-            if(!(opMode.opModeIsActive())) {
-                return
-            }
-        }
-    }
-
-
 }

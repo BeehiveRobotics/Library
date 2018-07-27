@@ -1,6 +1,7 @@
-package org.BeehiveRobotics.Library.Motors
+package org.BeehiveRobotics.Library.Systems
 
 import org.BeehiveRobotics.Library.Util.BROpMode
+import org.BeehiveRobotics.Library.Motors.Motor
 import com.qualcomm.robotcore.util.Range
 
 @Suppress("NAME_SHADOWING")
