@@ -3,7 +3,7 @@ package org.BeehiveRobotics.Library.Systems
 import org.BeehiveRobotics.Library.Util.BROpMode
 
 @Suppress("NAME_SHADOWING")
-class TankDrive(opMode: BROpMode, gearedType: DriveMotorSystem.GearedType = GearedType.NORMAL) : Runnable, DriveMotorSystem(opMode, gearedType) {
+class TankDrive(opMode: BROpMode, gearedType: DriveMotorSystem.GearedType = GearedType.NORMAL): DriveMotorSystem(opMode, gearedType) {
 
     fun drive(left: Double, right: Double, inches: Double, waitForCompletion: Boolean = true) = super.drive(left, right, left, right, inches, waitForCompletion)
     fun drive(left: Double, right: Double) = setRawPowers(left, right, left, right)

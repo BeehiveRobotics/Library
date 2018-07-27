@@ -3,8 +3,9 @@ package org.BeehiveRobotics.Library.Servos
 import org.BeehiveRobotics.Library.Util.BROpMode
 import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.util.Range
+import org.BeehiveRobotics.Library.Systems.RobotSystem
 
-class Servo(private val opMode: BROpMode, val name: String): Runnable {
+class Servo(private val opMode: BROpMode, val name: String): RobotSystem(opMode) {
 
     private val servo: Servo = opMode.hardwareMap.get(Servo::class.java, name)
     private var servoPosition: Double = 0.0
@@ -55,4 +56,4 @@ class Servo(private val opMode: BROpMode, val name: String): Runnable {
         }
     }
 }
-//TODO: Servo speed managing
+//TODO: Finish this with speed control and more Kotlinization, kinda like ../Motors/Motor.kt has

@@ -15,9 +15,9 @@ class Controller(val gamepad: Gamepad) {
     private var dpad_rightPrev = false
 
     fun leftStickX(): Double = gamepad.left_stick_x.toDouble()
-    fun leftStickY(): Double = (-gamepad.left_stick_y).toDouble()
+    fun leftStickY(): Double = -gamepad.left_stick_y.toDouble()
     fun rightStickX(): Double = gamepad.right_stick_x.toDouble()
-    fun rightStickY(): Double = (-gamepad.right_stick_y).toDouble()
+    fun rightStickY(): Double = -gamepad.right_stick_y.toDouble()
 
     fun leftTrigger(): Double = gamepad.left_trigger.toDouble()
     fun rightTrigger(): Double = gamepad.right_trigger.toDouble()
