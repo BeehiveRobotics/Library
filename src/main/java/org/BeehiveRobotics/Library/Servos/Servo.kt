@@ -19,7 +19,7 @@ class Servo(private val opMode: BROpMode, val name: String, var targetPosition: 
             servo.position = Range.clip(value, MIN_POSITION, MAX_POSITION)
         }
         get() = servo.position
-    var servoSpeed: Double = 1.0
+    var speed: Double = 1.0
         set(value) {
             Range.clip(Math.abs(value), 0.0, 1.0)
         }
@@ -44,7 +44,7 @@ class Servo(private val opMode: BROpMode, val name: String, var targetPosition: 
             val DPS = RPS*360 //degrees per second
             val DPI = DPS/increment //degreees per increment
             val PPI = DPI/degrees //proportion per increment
-            val CPPI = PPI*servoSpeed //calculated ppi, taking into account speed
+            val CPPI = PPI*speed //calculated ppi, taking into account speed
             position = if(targetPosition<position) position - CPPI else if(targetPosition>position) position + CPPI else position
             sleep(((index * increment) - time.milliseconds()).toLong())
             index.inc()
