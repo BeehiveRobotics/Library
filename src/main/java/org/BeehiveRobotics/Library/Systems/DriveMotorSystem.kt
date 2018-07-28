@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime
 import org.BeehiveRobotics.Library.Sensors.REVIMU
 
 
-abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var gearedType: GearedType = GearedType.NORMAL): RobotSystem(opMode) {
+abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var gearedType: GearedType = GearedType.NORMAL): RobotSystem(opMode), Runnable {
     protected val FrontLeft: Motor = Motor(opMode, "fl")
     protected val FrontRight: Motor = Motor(opMode, "fr")
     protected val RearLeft: Motor = Motor(opMode, "rl")

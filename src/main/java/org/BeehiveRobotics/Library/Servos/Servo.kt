@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.util.Range
 import org.BeehiveRobotics.Library.Systems.RobotSystem
 
-class Servo(private val opMode: BROpMode, val name: String): RobotSystem(opMode) {
+class Servo(private val opMode: BROpMode, val name: String): RobotSystem(opMode), Runnable {
 
     private val servo: Servo = opMode.hardwareMap.get(Servo::class.java, name)
     private var servoPosition: Double = 0.0

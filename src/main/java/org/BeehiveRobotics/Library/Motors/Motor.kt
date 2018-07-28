@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime
 import org.BeehiveRobotics.Library.Util.BROpMode
 import org.BeehiveRobotics.Library.Systems.RobotSystem
 
-class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode) {
+class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode), Runnable {
     private val motor: DcMotor = opMode.hardwareMap.get(DcMotor::class.java, name)
     private val RAMP_LOG_EXPO = 0.8
     var MIN_SPEED = 0.2

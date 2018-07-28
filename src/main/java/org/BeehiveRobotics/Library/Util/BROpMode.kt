@@ -18,8 +18,6 @@ abstract class BROpMode: LinearOpMode() {
 
     abstract fun run()
 
-    open fun end() {}
-
     fun showLine(line: String) {
         telemetry.addLine(line)
         telemetry.update()
@@ -55,8 +53,6 @@ abstract class BROpMode: LinearOpMode() {
                 }
                 BROpMode.OpModeType.Autonomous -> run()
             }
-        } finally {
-            end()
-        }
+        } finally {}
     }
 }

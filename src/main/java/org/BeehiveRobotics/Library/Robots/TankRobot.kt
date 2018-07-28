@@ -8,4 +8,8 @@ class TankRobot(private val opMode: BROpMode): Robot(opMode) {
     fun init() {
         drive = TankDrive(opMode)
     }
+    override fun waitUntilNotBusy() {
+        while(opMode.opModeIsActive() && drive.isBusy) {}
+    }
+
 }
