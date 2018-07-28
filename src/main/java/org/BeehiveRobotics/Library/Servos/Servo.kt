@@ -33,7 +33,7 @@ class Servo(private val opMode: BROpMode, val name: String, var targetPosition: 
 
     init {
         thread.start() // it can just constantly run a thread, why not
-    }    
+    }
     override fun run() {
         val time = ElapsedTime()
         var index = 1
