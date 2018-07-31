@@ -18,29 +18,25 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
         set(speed) {
             this.MAX_SPEED = Math.abs(speed)
         }
-    var target: Double = 0.0
+    var target = 0.0
         set(target) {
             resetEncoder()
             this.current = currentPosition
             this.target = Math.abs(target)
         }
-    private var current: Double = 0.0
-    var power: Double = 0.0
+    private var current = 0.0
+    var power = 0.0
         set(value) {
-            if (!this.opMode.opModeIsActive() || value == 0.0 || isAtTarget()) {
-                stopMotor()
-            }
+            if (!this.opMode.opModeIsActive() || value == 0.0 || isAtTarget()) stopMotor()
             this.current = Math.abs(currentPosition)
-            val k: Double = 4.0 / target
-            val calculated_power: Double = k * this.current * (1 - (this.current / this.target)) * value + java.lang.Double.MIN_VALUE
-            val expo_speed: Double = Math.pow(Math.abs(calculated_power), RAMP_LOG_EXPO)
-            if (power < 0) {
-                this.rawPower = -expo_speed
-            }
+            val k = 4.0 / target
+            val calculated_power = k * this.current * (1 - (this.current / this.target)) * value + java.lang.Double.MIN_VALUE
+            val expo_speed = Math.pow(Math.abs(calculated_power), RAMP_LOG_EXPO)
+            if (power < 0) this.rawPower = -expo_speed
             this.rawPower = expo_speed
 
         }
-    private var task: Tasks = Tasks.Stop
+    private var task = Tasks.Stop
     var runMode: DcMotor.RunMode
         set(runMode) {
             this.motor.mode = runMode
@@ -55,19 +51,14 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
             this.motor.zeroPowerBehavior = zeroPowerBehavior
         }
         get() = this.motor.zeroPowerBehavior
-    var rawPower: Double
+    var rawPower: Double 
         set(value) {
             if (opMode.opModeIsActive()) {
-                if (value > 0) {
-                    this.motor.power = Range.clip(value, MIN_SPEED, MAX_SPEED)
-                } else if (value < 0) {
-                    this.motor.power = Range.clip(value, -MAX_SPEED, -MIN_SPEED)
-                } else {
-                    stopMotor()
-                }
-            } else {
-                stopMotor()
-            }
+                if (value > 0) this.motor.power = Range.clip(value, MIN_SPEED, MAX_SPEED)
+                else if (value < 0) this.motor.power = Range.clip(value, -MAX_SPEED, -MIN_SPEED)
+                else stopMotor()
+            } 
+            else stopMotor()
         }
         get() = motor.power
     var direction: DcMotorSimple.Direction
@@ -82,7 +73,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
         NEVEREST60(1680.0)
     }
 
-    enum class Tasks{
+    enum class Tasks {
         RunToPosition, Stop
     }
     
@@ -129,17 +120,13 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
         when(this.task) {
             Tasks.RunToPosition -> {
                 while(!this.isAtTarget()) {
-                    if(!opMode.opModeIsActive()) {
-                        return
-                    }
+                    if(!opMode.opModeIsActive()) return                    
                     this.power = this.power
                 }
                 this.stopMotor()
                 Thread.currentThread().interrupt()
             }
-            Tasks.Stop -> {
-                this.stopMotor()
-            }
+            Tasks.Stop -> this.stopMotor()            
         }
         isBusy = false
     }

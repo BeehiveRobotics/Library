@@ -15,9 +15,7 @@ class MRGyro(opMode: BROpMode, name: String) {
         calibrateTime.reset()
         gyro.calibrate()
         while(gyro.isCalibrating) {
-            if(calibrateTime.seconds() > timeoutSeconds) {
-                return false
-            }
+            if(calibrateTime.seconds() > timeoutSeconds) return false            
         }
         return true
     }

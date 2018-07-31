@@ -14,9 +14,7 @@ abstract class RobotSystem(private val opMode: BROpMode) {
         val time = ElapsedTime()
         time.reset()
         while(time.milliseconds() < milliseconds) {
-            if(!opMode.opModeIsActive()) {
-                return
-            }
+            if(!opMode.opModeIsActive()) return            
         }
     }
 }

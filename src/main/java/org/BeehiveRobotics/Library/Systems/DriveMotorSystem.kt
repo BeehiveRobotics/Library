@@ -358,6 +358,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
 
     override fun run() {
         isBusy = true
+        opMode.addLine("Multi-thread ID: ${Thread.currentThread().id}") //Use  this line to display the thread id of drivemotorsystem multi-threading
         when(task) {
             Tasks.EncoderDrive -> drive(flSpeed, frSpeed, rlSpeed, rrSpeed, inches, true)
             Tasks.RightGyro -> rightGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target, true)
