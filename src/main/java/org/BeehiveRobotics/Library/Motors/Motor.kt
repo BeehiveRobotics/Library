@@ -12,17 +12,17 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
     private val RAMP_LOG_EXPO = 0.8
     var MIN_SPEED = 0.2
         set(speed) {
-            this.MIN_SPEED = Math.abs(speed)
+            field = Math.abs(speed)
         }
     var MAX_SPEED = 1.0
         set(speed) {
-            this.MAX_SPEED = Math.abs(speed)
+            field = Math.abs(speed)
         }
     var target = 0.0
         set(target) {
             resetEncoder()
             this.current = currentPosition
-            this.target = Math.abs(target)
+            field = Math.abs(target)
         }
     private var current = 0.0
     var power = 0.0
@@ -32,9 +32,8 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
             val k = 4.0 / target
             val calculated_power = k * this.current * (1 - (this.current / this.target)) * value + java.lang.Double.MIN_VALUE
             val expo_speed = Math.pow(Math.abs(calculated_power), RAMP_LOG_EXPO)
-            if (power < 0) this.rawPower = -expo_speed
-            this.rawPower = expo_speed
-
+            if (value < 0) this.rawPower = -expo_speed
+            else this.rawPower = expo_speed
         }
     private var task = Tasks.Stop
     var runMode: DcMotor.RunMode
@@ -113,7 +112,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
         this.motor.power = 0.0
     }
 
-    fun isAtTarget(): Boolean = Math.abs(current) >= Math.abs(target)
+    fun isAtTarget(): Boolean = Math.abs(currentPosition) >= Math.abs(target)
 
     override fun run() {
         isBusy = true

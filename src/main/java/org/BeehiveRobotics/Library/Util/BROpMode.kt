@@ -41,6 +41,7 @@ abstract class BROpMode(private val opModeType: OpModeType): LinearOpMode() {
             initialize()
             showLine("Ready to Start")
             waitForStart()
+            updateTelemetry()
             when (opModeType) {
                 BROpMode.OpModeType.TeleOp -> {
                     while (opModeIsActive()) {

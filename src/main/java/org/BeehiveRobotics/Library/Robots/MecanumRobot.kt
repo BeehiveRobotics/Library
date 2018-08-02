@@ -7,6 +7,7 @@ class MecanumRobot(private val opMode: BROpMode): Robot(opMode) {
     lateinit var drive: MecanumDrive
     fun init() {
         drive = MecanumDrive(opMode)
+        drive.init()
     }
     override fun waitUntilNotBusy() {
         while(opMode.opModeIsActive() && drive.isBusy) {}

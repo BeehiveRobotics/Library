@@ -27,41 +27,41 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
             FrontRight.model = model
             RearLeft.model = model
             RearRight.model = model
-            this.model = model
             this.CPR = model.CPR
+            field = model
         }
     protected var MIN_SPEED: Double = 0.25
         protected set(speed) {        
-            this.MIN_SPEED = speed
             FrontLeft.MIN_SPEED = MIN_SPEED
             FrontRight.MIN_SPEED = MIN_SPEED
             RearLeft.MIN_SPEED = MIN_SPEED
             RearRight.MIN_SPEED = MIN_SPEED
+            field = speed
         }
     protected var MAX_SPEED: Double = 1.0
         protected set(speed) {
-            this.MAX_SPEED = speed
             FrontLeft.MAX_SPEED = MAX_SPEED
             FrontRight.MAX_SPEED = MAX_SPEED
             RearLeft.MAX_SPEED = MAX_SPEED
             RearRight.MAX_SPEED = MAX_SPEED
+            field = speed
         }
-    var zeroPowerBehavior: DcMotor.ZeroPowerBehavior
+    var zeroPowerBehavior: DcMotor.ZeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
         set(zeroPowerBehavior) {
-            this.zeroPowerBehavior = zeroPowerBehavior
             this.FrontLeft.zeroPowerBehavior = zeroPowerBehavior
             this.FrontRight.zeroPowerBehavior = zeroPowerBehavior
             this.RearLeft.zeroPowerBehavior = zeroPowerBehavior
             this.RearRight.zeroPowerBehavior = zeroPowerBehavior
+            field = zeroPowerBehavior
         }
         get() = this.zeroPowerBehavior
-    protected var runMode: DcMotor.RunMode
+    protected var runMode: DcMotor.RunMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
         set (runMode) {
-            this.runMode = runMode
             FrontLeft.runMode = runMode
             FrontRight.runMode = runMode
             RearLeft.runMode = runMode
             RearRight.runMode = runMode
+            field = runMode
         }
         get() = this.runMode
 
@@ -114,14 +114,16 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         this.inches = inches
         resetEncoders()
         val clicks: Double = inches_to_clicks(inches)
-        val highestPower: Double = listOf(Math.abs(flSpeed), Math.abs(frSpeed), Math.abs(rlSpeed), Math.abs(rrSpeed)).max() ?: java.lang.Double.MIN_VALUE
-        val flTarget: Double = clicks * flSpeed /  highestPower
+        val highestPower: Double = Math.max(listOf(Math.abs(flSpeed), Math.abs(frSpeed), Math.abs(rlSpeed), Math.abs(rrSpeed)).max() ?: java.lang.Double.MIN_VALUE, java.lang.Double.MIN_VALUE)
+        val flTarget: Double = clicks * flSpeed / highestPower
         val frTarget: Double = clicks * frSpeed / highestPower
         val rlTarget: Double = clicks * rlSpeed / highestPower
         val rrTarget: Double = clicks * rrSpeed / highestPower
         setTargets(flTarget, frTarget, rlTarget, rrTarget)
+        setPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
         if(waitForCompletion) {
             while(!allMotorsAtTarget()) {
+                opMode.showLine("Entered loop")
                 setPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
                 if(!opMode.opModeIsActive()) {
                     stopMotors()
@@ -269,30 +271,13 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         return this
     }
 
-    fun setZeroPowerBehavior(zeroPowerBehavior: DcMotor.ZeroPowerBehavior): DriveMotorSystem {
-        FrontLeft.zeroPowerBehavior = zeroPowerBehavior
-        FrontRight.zeroPowerBehavior = zeroPowerBehavior
-        RearLeft.zeroPowerBehavior = zeroPowerBehavior
-        RearRight.zeroPowerBehavior = zeroPowerBehavior
-        return this
-    }
-
-    protected fun setRunMode(runMode: DcMotor.RunMode): DriveMotorSystem {
-        FrontLeft.runMode = runMode
-        FrontRight.runMode = runMode
-        RearLeft.runMode = runMode
-        RearRight.runMode = runMode
-        return this
-    }
 
     protected fun setGearedType(gearedType: GearedType): DriveMotorSystem {
         this.gearedType = gearedType
         return this
     }
 
-    protected fun allMotorsAtTarget(): Boolean {
-        return FrontLeft.isAtTarget() && FrontRight.isAtTarget() && RearLeft.isAtTarget() && RearRight.isAtTarget()
-    }
+    protected fun allMotorsAtTarget(): Boolean = FrontLeft.isAtTarget() && FrontRight.isAtTarget() && RearLeft.isAtTarget() && RearRight.isAtTarget()
 
     protected fun setPowers(fl: Double, fr: Double, rl: Double, rr: Double) {
         FrontLeft.power = fl
