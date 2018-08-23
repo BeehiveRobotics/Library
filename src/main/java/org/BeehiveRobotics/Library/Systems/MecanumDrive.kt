@@ -23,10 +23,10 @@ class MecanumDrive(opMode: BROpMode, gearedType: DriveMotorSystem.GearedType = G
     }
 
     fun drive(xLeft: Double, yLeft: Double, xRight: Double, yRight: Double) {
-        val flSpeed: Double = clip(yLeft - xLeft)
-        val frSpeed: Double = clip(yRight + xRight)
-        val rlSpeed: Double = clip(yLeft + xLeft)
-        val rrSpeed: Double = clip(yRight - xRight)
+        val flSpeed: Double = clip(yLeft + xLeft)
+        val frSpeed: Double = clip(yRight - xRight)
+        val rlSpeed: Double = clip(yLeft - xLeft)
+        val rrSpeed: Double = clip(yRight + xRight)
         super.setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
     }
 

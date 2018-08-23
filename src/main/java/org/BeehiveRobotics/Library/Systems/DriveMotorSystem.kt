@@ -123,7 +123,6 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         setPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
         if(waitForCompletion) {
             while(!allMotorsAtTarget()) {
-                opMode.showLine("Entered loop")
                 setPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
                 if(!opMode.opModeIsActive()) {
                     stopMotors()
@@ -337,7 +336,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
 
     protected fun calculateProportion(current: Double, start: Double, distance: Double): Double {
         val remaining = current - start
-        val proportion = (1 - (Math.abs((remaining) / distance))) * 0.75 + 0.25
+        val proportion = (1 - (Math.abs((remaining) / distance))) * (1-MIN_SPEED) + MIN_SPEED
         return proportion
     }
 

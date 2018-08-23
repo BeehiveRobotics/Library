@@ -53,8 +53,8 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
     var rawPower: Double 
         set(value) {
             if (opMode.opModeIsActive()) {
-                if (value > 0) this.motor.power = Range.clip(value, MIN_SPEED, MAX_SPEED)
-                else if (value < 0) this.motor.power = Range.clip(value, -MAX_SPEED, -MIN_SPEED)
+                if (value > 0.0) this.motor.power = Range.clip(value, MIN_SPEED, MAX_SPEED)
+                else if (value < 0.0) this.motor.power = Range.clip(value, -MAX_SPEED, -MIN_SPEED)
                 else stopMotor()
             } 
             else stopMotor()
