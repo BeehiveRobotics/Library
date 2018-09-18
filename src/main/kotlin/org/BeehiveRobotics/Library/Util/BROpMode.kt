@@ -16,6 +16,8 @@ abstract class BROpMode(private val opModeType: OpModeType): LinearOpMode() {
 
     abstract fun run()
 
+    open fun end() {}
+
     fun showLine(line: String) {
         telemetry.addLine(line)
         telemetry.update()
@@ -49,6 +51,7 @@ abstract class BROpMode(private val opModeType: OpModeType): LinearOpMode() {
                         controller1.update()
                         controller2.update()
                     }
+                    end()
                 }
                 BROpMode.OpModeType.Autonomous -> run()
             }
