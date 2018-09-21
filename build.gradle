@@ -6,11 +6,11 @@ apply plugin: 'kotlin-android'
 android {
 
     defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 23
+        minSdkVersion 21
+        targetSdkVersion 28
     }
 
-    compileSdkVersion 23
+    compileSdkVersion 28
     buildToolsVersion '28.0.1'
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7

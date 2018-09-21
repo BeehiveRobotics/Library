@@ -25,12 +25,12 @@ abstract class BROpMode(private val opModeType: OpModeType): LinearOpMode() {
     
     fun addLine(line: String) = telemetry.addLine(line)
 
-    fun showData(title: String, value: String) {
+    fun showData(title: String, value: Any) {
         telemetry.addData(title, value)
         telemetry.update()
     }
 
-    fun addData(title: String, value: String) = telemetry.addData(title, value)
+    fun addData(title: String, value: Any) = telemetry.addData(title, value)
 
     fun updateTelemetry() = telemetry.update()
 
