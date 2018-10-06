@@ -5,7 +5,7 @@ import org.BeehiveRobotics.Library.Systems.MecanumDrive
 
 class MecanumRobot(private val opMode: BROpMode): Robot(opMode) {
     lateinit var drive: MecanumDrive
-    fun init() {
+    override fun init() {
         drive = MecanumDrive(opMode)
         drive.init()
     }

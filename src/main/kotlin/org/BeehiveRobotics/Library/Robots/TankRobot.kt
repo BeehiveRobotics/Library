@@ -5,7 +5,7 @@ import org.BeehiveRobotics.Library.Util.BROpMode
 
 class TankRobot(private val opMode: BROpMode): Robot(opMode) {
     lateinit var drive: TankDrive
-    fun init() {
+    override fun init() {
         drive = TankDrive(opMode)
         drive.init()
     }
