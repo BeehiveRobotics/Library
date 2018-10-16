@@ -5,7 +5,7 @@ import org.BeehiveRobotics.Library.Motors.Motor
 import com.qualcomm.robotcore.util.Range
 
 @Suppress("NAME_SHADOWING")
-class MecanumDrive(opMode: BROpMode, gearedType: DriveMotorSystem.GearedType = GearedType.NORMAL): DriveMotorSystem(opMode, gearedType) {
+class MecanumDrive(private val opMode: BROpMode, gearedType: DriveMotorSystem.GearedType = GearedType.NORMAL, gearRatio: Double = 1.0): DriveMotorSystem(opMode, gearedType, gearRatio) {
     fun drive(x: Double, y: Double, z: Double, inches: Double, waitForCompletion: Boolean = true) {
         val flSpeed: Double = clip(y + z + x)
         val frSpeed: Double = clip(y - z - x)
@@ -60,19 +60,19 @@ class MecanumDrive(opMode: BROpMode, gearedType: DriveMotorSystem.GearedType = G
         super.rightGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target, waitForCompletion)
     }
 
-    fun forward(speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(0.0, Math.abs(speed), 0.0, inches, waitForCompletion)
-    fun backward(speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(0.0, -Math.abs(speed), 0.0, inches, waitForCompletion)
-    fun strafeLeft(speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(-Math.abs(speed), 0.0, 0.0, inches, waitForCompletion)
-    fun strafeRight(speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(Math.abs(speed), 0.0, 0.0, inches, waitForCompletion)
-    fun spinLeft(speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(0.0, 0.0, -Math.abs(speed), inches, waitForCompletion)
-    fun spinRight(speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(0.0, 0.0, Math.abs(speed), inches, waitForCompletion)
-    fun leftForward(speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(0.0, 0.5*Math.abs(speed), 0.5*Math.abs(speed), inches, waitForCompletion)
-    fun leftBackward(speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(0.0, -0.5*Math.abs(speed), -0.5*Math.abs(speed), inches, waitForCompletion)
-    fun rightForward(speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(0.0, 0.5*Math.abs(speed), -0.5*Math.abs(speed), inches, waitForCompletion)
+    fun forward      (speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(0.0, Math.abs(speed), 0.0, inches, waitForCompletion)
+    fun backward     (speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(0.0, -Math.abs(speed), 0.0, inches, waitForCompletion)
+    fun strafeLeft   (speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(-Math.abs(speed), 0.0, 0.0, inches, waitForCompletion)
+    fun strafeRight  (speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(Math.abs(speed), 0.0, 0.0, inches, waitForCompletion)
+    fun spinLeft     (speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(0.0, 0.0, -Math.abs(speed), inches, waitForCompletion)
+    fun spinRight    (speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(0.0, 0.0, Math.abs(speed), inches, waitForCompletion)
+    fun leftForward  (speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(0.0, 0.5*Math.abs(speed), 0.5*Math.abs(speed), inches, waitForCompletion)
+    fun leftBackward (speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(0.0, -0.5*Math.abs(speed), -0.5*Math.abs(speed), inches, waitForCompletion)
+    fun rightForward (speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(0.0, 0.5*Math.abs(speed), -0.5*Math.abs(speed), inches, waitForCompletion)
     fun rightBackward(speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(0.0, -0.5*Math.abs(speed), 0.5*Math.abs(speed), inches, waitForCompletion)
-    fun forwardLeft(speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(-Math.abs(speed), Math.abs(speed), 0.0, inches, waitForCompletion)
-    fun forwardRight(speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(Math.abs(speed), Math.abs(speed), 0.0, inches, waitForCompletion)
-    fun backwardLeft(speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(-Math.abs(speed), -Math.abs(speed), 0.0, inches, waitForCompletion)
+    fun forwardLeft  (speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(-Math.abs(speed), Math.abs(speed), 0.0, inches, waitForCompletion)
+    fun forwardRight (speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(Math.abs(speed), Math.abs(speed), 0.0, inches, waitForCompletion)
+    fun backwardLeft (speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(-Math.abs(speed), -Math.abs(speed), 0.0, inches, waitForCompletion)
     fun backwardRight(speed: Double, inches: Double, waitForCompletion: Boolean = true) = this.drive(Math.abs(speed), -Math.abs(speed), 0.0, inches, waitForCompletion)
 
     fun forward(speed: Double) = this.drive(0.0, Math.abs(speed), 0.0)

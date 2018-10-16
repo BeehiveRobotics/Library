@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime
 import org.BeehiveRobotics.Library.Sensors.REVIMU
 
 
-abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var gearedType: GearedType = GearedType.NORMAL): RobotSystem(opMode), Runnable {
+abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var gearedType: GearedType = GearedType.NORMAL, private val gearRatio: Double = 1.0): RobotSystem(opMode), Runnable {
     protected val FrontLeft: Motor = Motor(opMode, "fl")
     protected val FrontRight: Motor = Motor(opMode, "fr")
     protected val RearLeft: Motor = Motor(opMode, "rl")
@@ -301,7 +301,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
 
     internal fun inches_to_clicks(inches: Double): Double {
         val circumference = WheelDiameter * Math.PI
-        return CPR / circumference * inches
+        return CPR / circumference * inches / gearRatio
 
     }
 
