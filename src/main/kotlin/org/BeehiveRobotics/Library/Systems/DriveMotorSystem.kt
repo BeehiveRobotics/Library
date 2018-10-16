@@ -21,8 +21,8 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
     protected val GYRO_SLOW_MODE_OFFSET: Double = 10.0
     protected var CPR: Double = 1120.0
         private set
-    protected var model: Motor.MotorModel = Motor.MotorModel.NEVEREST40
-        protected set(model: Motor.MotorModel) {
+    var model: Motor.MotorModel = Motor.MotorModel.NEVEREST40
+        set(model: Motor.MotorModel) {
             FrontLeft.model = model
             FrontRight.model = model
             RearLeft.model = model

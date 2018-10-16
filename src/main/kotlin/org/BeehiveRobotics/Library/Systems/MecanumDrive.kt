@@ -5,7 +5,7 @@ import org.BeehiveRobotics.Library.Motors.Motor
 import com.qualcomm.robotcore.util.Range
 
 @Suppress("NAME_SHADOWING")
-class MecanumDrive(private val opMode: BROpMode, gearedType: DriveMotorSystem.GearedType = GearedType.NORMAL, gearRatio: Double = 1.0): DriveMotorSystem(opMode, gearedType, gearRatio) {
+class MecanumDrive(opMode: BROpMode, gearedType: DriveMotorSystem.GearedType = GearedType.NORMAL, gearRatio: Double = 1.0): DriveMotorSystem(opMode, gearedType, gearRatio) {
     fun drive(x: Double, y: Double, z: Double, inches: Double, waitForCompletion: Boolean = true) {
         val flSpeed: Double = clip(y + z + x)
         val frSpeed: Double = clip(y - z - x)
