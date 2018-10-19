@@ -59,7 +59,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
             } 
             else stopMotor()
         }
-        get() = motor.power
+        get() = this.motor.power
     var direction: DcMotorSimple.Direction
         set(value) {
             motor.direction = value

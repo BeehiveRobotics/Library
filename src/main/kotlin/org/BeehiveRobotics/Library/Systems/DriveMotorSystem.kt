@@ -128,6 +128,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
                     stopMotors()
                     return
                 }
+                //opMode.showLine(toString()) //Enable this line for information on each of the motors
             }
             stopMotors()
             isBusy = false
@@ -350,5 +351,30 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
             Tasks.Stop -> stopMotors()
         }
         isBusy = false
+    }
+
+    override fun toString(): String {
+        return "" + 
+        "FrontLeft: " + "\n" + 
+        "\t" + "Target Power: " + FrontLeft.power + "\n"+ 
+        "\t" + "Current Power: " + FrontLeft.rawPower + "\n" + 
+        "\t" + "Target Clicks: " + FrontLeft.target + "\n" + 
+        "\t" + "Current Clicks: " + FrontLeft.currentPosition + "\n" + 
+        "FrontRight: " + "\n" + 
+        "\t" + "Target Power: " + FrontRight.power + "\n" +
+        "\t" + "Current Power: " + FrontRight.rawPower + "\n" + 
+        "\t" + "Target Clicks: " + FrontRight.target + "\n" + 
+        "\t" + "Current Clicks: " + FrontRight.currentPosition + "\n" + 
+        "RearLeft: " + "\n" + 
+        "\t" + "Target Power: " + RearLeft.power + "\n" + 
+        "\t" + "Current Power: " + RearLeft.rawPower + "\n" + 
+        "\t" + "Target Clicks: " + RearLeft.target + "\n" + 
+        "\t" + "Current Clicks: " + RearLeft.currentPosition + "\n" + 
+        "RearRight: " + "\n" + 
+        "\t" + "Target Power: " + RearRight.power + "\n" + 
+        "\t" + "Current Power: " + RearRight.rawPower + "\n" + 
+        "\t" + "Target Clicks: " + RearRight.target + "\n" + 
+        "\t" + "Current Clicks: " + RearRight.currentPosition + "\n"
+        
     }
 } 
