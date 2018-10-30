@@ -9,10 +9,10 @@ class Controller(private val gamepad: Gamepad) {
     private var yPrev = false
     private var leftBumperPrev = false
     private var rightBumperPrev = false
-    private var dpad_upPrev = false
-    private var dpad_downPrev = false
-    private var dpad_leftPrev = false
-    private var dpad_rightPrev = false
+    private var dpadUpPrev = false
+    private var dpadDownPrev = false
+    private var dpadLeftPrev = false
+    private var dpadRightPrev = false
     
     var leftStickX = 0.0
         private set
@@ -41,16 +41,16 @@ class Controller(private val gamepad: Gamepad) {
         private set
         get() = gamepad.right_bumper
 
-    var dpad_up = false
+    var dpadUp = false
         private set
         get() = gamepad.dpad_up
-    var dpad_down = false
+    var dpadDown = false
         private set
         get() = gamepad.dpad_down
-    var dpad_left = false
+    var dpadLeft = false
         private set
         get() = gamepad.dpad_left
-    var dpad_right = false
+    var dpadRight = false
         private set
         get() = gamepad.dpad_right
 
@@ -87,18 +87,18 @@ class Controller(private val gamepad: Gamepad) {
         private set
         get() = rightBumper && !rightBumperPrev
 
-    var dpad_upToggle = false
+    var dpadUpToggle = false
         private set
-        get() = dpad_up && !dpad_upPrev
-    var dpad_downToggle = false
+        get() = dpadUp && !dpadUpPrev
+    var dpadDownToggle = false
         private set
-        get() = dpad_down && !dpad_downPrev
-    var dpad_leftToggle = false
+        get() = dpadDown && !dpadDownPrev
+    var dpadLeftToggle = false
         private set
-        get() = dpad_left && !dpad_leftPrev
-    var dpad_rightToggle = false
+        get() = dpadLeft && !dpadLeftPrev
+    var dpadRightToggle = false
         private set
-        get() = dpad_right && !dpad_rightPrev
+        get() = dpadRight && !dpadRightPrev
 
     fun update() {
         aPrev = a
@@ -109,9 +109,9 @@ class Controller(private val gamepad: Gamepad) {
         leftBumperPrev = leftBumper
         rightBumperPrev = rightBumper
 
-        dpad_upPrev = dpad_up
-        dpad_downPrev = dpad_down
-        dpad_leftPrev = dpad_left
-        dpad_rightPrev = dpad_right
+        dpadUpPrev = dpadUp
+        dpadDownPrev = dpadDown
+        dpadLeftPrev = dpadLeft
+        dpadRightPrev = dpadRight
     }
 }

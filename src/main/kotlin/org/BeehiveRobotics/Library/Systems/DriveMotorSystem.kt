@@ -86,7 +86,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         EncoderDrive, RightGyro, LeftGyro, Stop
     }
 
-    fun init() {
+    override fun init() {
         if (gearedType == GearedType.NORMAL) {
             FrontLeft.direction = DcMotorSimple.Direction.REVERSE
             RearLeft.direction = DcMotorSimple.Direction.REVERSE

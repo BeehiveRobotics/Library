@@ -82,7 +82,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
         resetEncoder()
     }
 
-    internal fun resetEncoder(): Motor {
+    fun resetEncoder(): Motor {
         val initialBehavior = this.runMode
         this.runMode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
         this.runMode = initialBehavior
@@ -90,7 +90,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
         return this
     }
 
-    internal fun runToTarget(target: Double, power: Double, waitForCompletion: Boolean = true) {
+    fun runToTarget(target: Double, power: Double, waitForCompletion: Boolean = true) {
         isBusy = true
         this.target = Math.abs(target)
         this.power = power
