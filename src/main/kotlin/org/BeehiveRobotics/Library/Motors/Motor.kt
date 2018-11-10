@@ -48,6 +48,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
     var zeroPowerBehavior: DcMotor.ZeroPowerBehavior
         set(zeroPowerBehavior) {
             this.motor.zeroPowerBehavior = zeroPowerBehavior
+            this.rawPower = 0.0
         }
         get() = this.motor.zeroPowerBehavior
     var rawPower: Double 
@@ -90,7 +91,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
         return this
     }
 
-    fun runToTarget(target: Double, power: Double, waitForCompletion: Boolean = true) {
+    fun runToPosition(target: Double, power: Double, waitForCompletion: Boolean = true) {
         isBusy = true
         this.target = Math.abs(target)
         this.power = power

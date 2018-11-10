@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime
 
 class Servo(private val opMode: BROpMode, val name: String, var targetPosition: Double = 0.0): RobotSystem(opMode), Runnable {
     enum class ServoModel(val RPM: Double) {
-        REV(60.0) // TODO: TEST THIS NUMBER. THIS IS JUST A FILLER FOR NOW
+        REV(53.0) // TODO: TEST THIS NUMBER. THIS IS JUST A FILLER FOR NOW
     }
     private val servo: Servo = opMode.hardwareMap.get(Servo::class.java, name)
     var model: ServoModel = ServoModel.REV
@@ -48,6 +48,7 @@ class Servo(private val opMode: BROpMode, val name: String, var targetPosition: 
             position = if(targetPosition<position) position - CPPI else if(targetPosition>position) position + CPPI else position
             sleep(((index * increment) - time.milliseconds()).toLong())
             index.inc()
+            if(position == targetPosition) index = 1
         }
-    } //Test this speed control
+    } 
 }

@@ -50,6 +50,7 @@ abstract class BROpMode(private val opModeType: OpModeType): LinearOpMode() {
                         run()
                         controller1.update()
                         controller2.update()
+                        updateTelemetry()
                     }
                     end()
                 }

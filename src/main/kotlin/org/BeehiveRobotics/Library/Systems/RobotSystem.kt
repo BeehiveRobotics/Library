@@ -16,4 +16,5 @@ abstract class RobotSystem(private val opMode: BROpMode) {
         while(time.milliseconds() < milliseconds) if(!opMode.opModeIsActive()) return
     }
     open fun init() {}
+    open fun start() {}
 }
