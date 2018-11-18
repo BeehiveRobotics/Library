@@ -6,7 +6,6 @@ import org.BeehiveRobotics.Library.Util.BROpMode
 class TankDrive(opMode: BROpMode, gearedType: DriveMotorSystem.GearedType = GearedType.NORMAL): DriveMotorSystem(opMode, gearedType) {
 
     fun drive(left: Double, right: Double, inches: Double, waitForCompletion: Boolean = true) = super.drive(left, right, left, right, inches, waitForCompletion)
-    fun drive(left: Double, right: Double) = setRawPowers(left, right, left, right)
 
     fun rightGyro(leftSpeed: Double, rightSpeed: Double, target: Double, waitForCompletion: Boolean = true) = super.rightGyro(leftSpeed, rightSpeed, leftSpeed, rightSpeed, target, waitForCompletion)
     fun rightGyro(speed: Double, target: Double) = rightGyro(Math.abs(speed), -Math.abs(speed), target)

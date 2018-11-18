@@ -139,6 +139,9 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         }
     } 
 
+    fun drive(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double) = setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
+    fun drive(leftSpeed: Double, rightSpeed: Double) = setRawPowers(leftSpeed, rightSpeed, leftSpeed, rightSpeed)
+
 
     protected fun rightGyro(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, target: Double, waitForCompletion: Boolean = true) {
         isBusy = true
@@ -343,7 +346,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
 
     override fun run() {
         isBusy = true
-        opMode.addLine("Multi-thread ID: ${Thread.currentThread().id}") //Use  this line to display the thread id of drivemotorsystem multi-threading
+        opMode.dashboard.addLine("Multi-thread ID: ${Thread.currentThread().id}") //Use  this line to display the thread id of drivemotorsystem multi-threading
         when(task) {
             Tasks.EncoderDrive -> drive(flSpeed, frSpeed, rlSpeed, rrSpeed, inches, true)
             Tasks.RightGyro -> rightGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target, true)

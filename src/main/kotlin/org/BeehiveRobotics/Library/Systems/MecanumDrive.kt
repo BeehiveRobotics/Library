@@ -5,7 +5,7 @@ import org.BeehiveRobotics.Library.Motors.Motor
 import com.qualcomm.robotcore.util.Range
 
 @Suppress("NAME_SHADOWING")
-class MecanumDrive(opMode: BROpMode, gearedType: DriveMotorSystem.GearedType = GearedType.NORMAL, gearRatio: Double = 1.0): DriveMotorSystem(opMode, gearedType, gearRatio) {
+open class MecanumDrive(opMode: BROpMode, gearedType: DriveMotorSystem.GearedType = GearedType.NORMAL, gearRatio: Double = 1.0): DriveMotorSystem(opMode, gearedType, gearRatio) {
     fun drive(x: Double, y: Double, z: Double, inches: Double, waitForCompletion: Boolean = true) {
         val flSpeed: Double = clip(y + z + x)
         val frSpeed: Double = clip(y - z - x)
@@ -22,7 +22,7 @@ class MecanumDrive(opMode: BROpMode, gearedType: DriveMotorSystem.GearedType = G
         super.setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
     }
 
-    fun drive(xLeft: Double, yLeft: Double, xRight: Double, yRight: Double) {
+    fun driveLeftRight(xLeft: Double, yLeft: Double, xRight: Double, yRight: Double) {
         val flSpeed: Double = clip(yLeft + xLeft)
         val frSpeed: Double = clip(yRight - xRight)
         val rlSpeed: Double = clip(yLeft - xLeft)

@@ -8,6 +8,8 @@ abstract class BROpMode(private val opModeType: OpModeType): LinearOpMode() {
     protected lateinit var controller1: Controller
     protected lateinit var controller2: Controller
 
+    val dashboard = BRTelemetry(this)
+
     enum class OpModeType {
         Autonomous, TeleOp
     }
@@ -18,39 +20,26 @@ abstract class BROpMode(private val opModeType: OpModeType): LinearOpMode() {
 
     open fun end() {}
 
-    fun showLine(line: String) {
-        telemetry.addLine(line)
-        telemetry.update()
-    }
-    
-    fun addLine(line: String) = telemetry.addLine(line)
-
-    fun showData(title: String, value: Any) {
-        telemetry.addData(title, value)
-        telemetry.update()
-    }
-
-    fun addData(title: String, value: Any) = telemetry.addData(title, value)
-
-    fun updateTelemetry() = telemetry.update()
+    open fun firstStart() {}
 
     @Throws(InterruptedException::class)
     override fun runOpMode() {
         try {
-            showLine("Not ready to start")
+            dashboard.addLine("Not ready to start", true)
             controller1 = Controller(gamepad1)
             controller2 = Controller(gamepad2)
             initialize()
-            showLine("Ready to Start")
+            dashboard.addLine("Ready to Start", true)
             waitForStart()
-            updateTelemetry()
+            firstStart()
+            dashboard.update()
             when (opModeType) {
                 BROpMode.OpModeType.TeleOp -> {
                     while (opModeIsActive()) {
                         run()
                         controller1.update()
                         controller2.update()
-                        updateTelemetry()
+                        dashboard.update()
                     }
                     end()
                 }
