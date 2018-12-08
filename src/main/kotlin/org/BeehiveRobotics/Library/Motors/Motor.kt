@@ -104,6 +104,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
                 }
                 this.power = power
             }
+            stopMotor()
         }
         isBusy = false
     }
@@ -116,9 +117,9 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
 
     override fun toString(): String {
         return "" + 
-            "Target clicks: " + target + "\n" + 
-            "Target power: " + power + "\n" + 
-            "Current power: " + rawPower
+            "Target clicks: $target\n" + 
+            "Target power: $power\n" +  
+            "Current power: $rawPower\n"
     }
     override fun run() {
         isBusy = true
