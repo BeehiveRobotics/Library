@@ -20,31 +20,31 @@ abstract class BROpMode(private val opModeType: OpModeType): LinearOpMode() {
 
     open fun end() {}
 
-    open fun firstStart() {}
+    open fun onStartPressed() {}
 
     @Throws(InterruptedException::class)
     override fun runOpMode() {
         try {
-            dashboard.addLine("Not ready to start", true)
+            dashboard.addLine("Not ready to start")
+            dashboard.update()
             controller1 = Controller(gamepad1)
             controller2 = Controller(gamepad2)
             initialize()
-            dashboard.addLine("Ready to Start", true)
-            waitForStart()
-            firstStart()
+            dashboard.addLine("Ready to Start")
             dashboard.update()
+            waitForStart()
+            onStartPressed()
             when (opModeType) {
                 BROpMode.OpModeType.TeleOp -> {
                     while (opModeIsActive()) {
                         run()
                         controller1.update()
                         controller2.update()
-                        dashboard.update()
                     }
-                    end()
                 }
                 BROpMode.OpModeType.Autonomous -> run()
             }
+            end()
         } finally {}
     }
 }
