@@ -115,12 +115,11 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
 
     fun isAtTarget(): Boolean = Math.abs(currentPosition) >= Math.abs(target)
 
-    override fun toString(): String {
-        return "" + 
-            "Target clicks: $target\n" + 
-            "Target power: $power\n" +  
-            "Current power: $rawPower\n"
-    }
+    override fun toString(): String =
+        "Target clicks: $target\n" + 
+        "Target power: $power\n" +  
+        "Current power: $rawPower\n"
+        
     override fun run() {
         isBusy = true
         when(this.task) {

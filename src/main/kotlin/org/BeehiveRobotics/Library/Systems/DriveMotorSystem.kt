@@ -7,12 +7,11 @@ import org.BeehiveRobotics.Library.Util.BROpMode
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.BeehiveRobotics.Library.Sensors.REVIMU
 
-
 abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var gearedType: GearedType = GearedType.NORMAL, private val gearRatio: Double = 1.0): RobotSystem(opMode), Runnable {
-    protected val FrontLeft: Motor = Motor(opMode, "fl")
-    protected val FrontRight: Motor = Motor(opMode, "fr")
-    protected val RearLeft: Motor = Motor(opMode, "rl")
-    protected val RearRight: Motor = Motor(opMode, "rr")
+    protected val frontLeft: Motor = Motor(opMode, "fl")
+    protected val frontRight: Motor = Motor(opMode, "fr")
+    protected val rearLeft: Motor = Motor(opMode, "rl")
+    protected val rearRight: Motor = Motor(opMode, "rr")
     protected val gyro: REVIMU = REVIMU(opMode)
     protected var heading: Double = 0.0
         get() = gyro.heading
@@ -23,49 +22,49 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         private set
     var model: Motor.MotorModel = Motor.MotorModel.NEVEREST40
         set(model: Motor.MotorModel) {
-            FrontLeft.model = model
-            FrontRight.model = model
-            RearLeft.model = model
-            RearRight.model = model
+            frontLeft.model = model
+            frontRight.model = model
+            rearLeft.model = model
+            rearRight.model = model
             this.CPR = model.CPR
             field = model
         }
     protected var MIN_SPEED: Double = 0.25
         protected set(speed) {        
-            FrontLeft.MIN_SPEED = MIN_SPEED
-            FrontRight.MIN_SPEED = MIN_SPEED
-            RearLeft.MIN_SPEED = MIN_SPEED
-            RearRight.MIN_SPEED = MIN_SPEED
+            frontLeft.MIN_SPEED = MIN_SPEED
+            frontRight.MIN_SPEED = MIN_SPEED
+            rearLeft.MIN_SPEED = MIN_SPEED
+            rearRight.MIN_SPEED = MIN_SPEED
             field = speed
         }
     protected var MAX_SPEED: Double = 1.0
         protected set(speed) {
-            FrontLeft.MAX_SPEED = MAX_SPEED
-            FrontRight.MAX_SPEED = MAX_SPEED
-            RearLeft.MAX_SPEED = MAX_SPEED
-            RearRight.MAX_SPEED = MAX_SPEED
+            frontLeft.MAX_SPEED = MAX_SPEED
+            frontRight.MAX_SPEED = MAX_SPEED
+            rearLeft.MAX_SPEED = MAX_SPEED
+            rearRight.MAX_SPEED = MAX_SPEED
             field = speed
         }
     var zeroPowerBehavior: DcMotor.ZeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
         set(zeroPowerBehavior) {
-            this.FrontLeft.zeroPowerBehavior = zeroPowerBehavior
-            this.FrontRight.zeroPowerBehavior = zeroPowerBehavior
-            this.RearLeft.zeroPowerBehavior = zeroPowerBehavior
-            this.RearRight.zeroPowerBehavior = zeroPowerBehavior
+            this.frontLeft.zeroPowerBehavior = zeroPowerBehavior
+            this.frontRight.zeroPowerBehavior = zeroPowerBehavior
+            this.rearLeft.zeroPowerBehavior = zeroPowerBehavior
+            this.rearRight.zeroPowerBehavior = zeroPowerBehavior
             field = zeroPowerBehavior
         }
         get() = this.zeroPowerBehavior
     protected var runMode: DcMotor.RunMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
         set (runMode) {
-            FrontLeft.runMode = runMode
-            FrontRight.runMode = runMode
-            RearLeft.runMode = runMode
-            RearRight.runMode = runMode
+            frontLeft.runMode = runMode
+            frontRight.runMode = runMode
+            rearLeft.runMode = runMode
+            rearRight.runMode = runMode
             field = runMode
         }
         get() = this.runMode
 
-    protected var WheelDiameter: Double = 3.937
+    protected var WHEEL_DIAMETER: Double = 3.937
     protected final val GYRO_FINAL_SPEED: Double = 0.2
     private var flSpeed: Double = 0.0
     private var frSpeed: Double = 0.0
@@ -88,15 +87,15 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
 
     override fun init() {
         if (gearedType == GearedType.NORMAL) {
-            FrontLeft.direction = DcMotorSimple.Direction.REVERSE
-            RearLeft.direction = DcMotorSimple.Direction.REVERSE
-            FrontRight.direction = DcMotorSimple.Direction.FORWARD
-            RearRight.direction = DcMotorSimple.Direction.FORWARD
+            frontLeft.direction = DcMotorSimple.Direction.REVERSE
+            rearLeft.direction = DcMotorSimple.Direction.REVERSE
+            frontRight.direction = DcMotorSimple.Direction.FORWARD
+            rearRight.direction = DcMotorSimple.Direction.FORWARD
         } else {
-            FrontRight.direction = DcMotorSimple.Direction.REVERSE
-            RearRight.direction = DcMotorSimple.Direction.REVERSE
-            FrontLeft.direction = DcMotorSimple.Direction.FORWARD
-            RearLeft.direction = DcMotorSimple.Direction.FORWARD
+            frontRight.direction = DcMotorSimple.Direction.REVERSE
+            rearRight.direction = DcMotorSimple.Direction.REVERSE
+            frontLeft.direction = DcMotorSimple.Direction.FORWARD
+            rearLeft.direction = DcMotorSimple.Direction.FORWARD
         }
         this.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
         this.runMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
@@ -267,10 +266,10 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
     }
 
     protected fun resetEncoders(): DriveMotorSystem {
-        FrontLeft.resetEncoder()
-        FrontRight.resetEncoder()
-        RearLeft.resetEncoder()
-        RearRight.resetEncoder()
+        frontLeft.resetEncoder()
+        frontRight.resetEncoder()
+        rearLeft.resetEncoder()
+        rearRight.resetEncoder()
         return this
     }
 
@@ -280,41 +279,41 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         return this
     }
 
-    protected fun allMotorsAtTarget(): Boolean = FrontLeft.isAtTarget() && FrontRight.isAtTarget() && RearLeft.isAtTarget() && RearRight.isAtTarget()
+    protected fun allMotorsAtTarget(): Boolean = frontLeft.isAtTarget() && frontRight.isAtTarget() && rearLeft.isAtTarget() && rearRight.isAtTarget()
 
     protected fun setPowers(fl: Double, fr: Double, rl: Double, rr: Double) {
-        FrontLeft.power = fl
-        FrontRight.power = fr
-        RearLeft.power = rl
-        RearRight.power = rr
+        frontLeft.power = fl
+        frontRight.power = fr
+        rearLeft.power = rl
+        rearRight.power = rr
     }
 
     protected fun setRawPowers(fl: Double, fr: Double, rl: Double, rr: Double) {
-        FrontLeft.rawPower = fl
-        FrontRight.rawPower = fr
-        RearLeft.rawPower = rl
-        RearRight.rawPower = rr
+        frontLeft.rawPower = fl
+        frontRight.rawPower = fr
+        rearLeft.rawPower = rl
+        rearRight.rawPower = rr
     }
 
     internal fun setTargets(fl: Double, fr: Double, rl: Double, rr: Double) {
-        FrontLeft.target = fl
-        FrontRight.target = fr
-        RearLeft.target = rl
-        RearRight.target = rr
+        frontLeft.target = fl
+        frontRight.target = fr
+        rearLeft.target = rl
+        rearRight.target = rr
     }
 
     internal fun inches_to_clicks(inches: Double): Double {
-        val circumference = WheelDiameter * Math.PI
+        val circumference = WHEEL_DIAMETER * Math.PI
         return CPR / circumference * inches / gearRatio
 
     }
 
     fun stopMotors(waitForCompletion: Boolean = true) {
         if(waitForCompletion) {
-            FrontLeft.stopMotor()
-            FrontRight.stopMotor()
-            RearLeft.stopMotor()
-            RearRight.stopMotor()
+            frontLeft.stopMotor()
+            frontRight.stopMotor()
+            rearLeft.stopMotor()
+            rearRight.stopMotor()
         } else {
             this.task = Tasks.Stop
             val thread: Thread = Thread(this)
@@ -322,7 +321,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         }
     }
 
-    fun avgSpeed() = (Math.abs(FrontLeft.power) + Math.abs(FrontRight.power) + Math.abs(RearLeft.power) + Math.abs(RearRight.power)) / 4
+    fun avgSpeed() = (Math.abs(frontLeft.power) + Math.abs(frontRight.power) + Math.abs(rearLeft.power) + Math.abs(rearRight.power)) / 4
 
     protected fun calculateAdjustedTarget(target: Double, direction: TurnDirection): Double {
         when(direction) {
@@ -346,7 +345,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
 
     override fun run() {
         isBusy = true
-        opMode.dashboard.addLine("Multi-thread ID: ${Thread.currentThread().id}") //Use  this line to display the thread id of drivemotorsystem multi-threading
+        //opMode.dashboard.addLine("Multi-thread ID: ${Thread.currentThread().id}") //Use  this line to display the thread id of drivemotorsystem multi-threading
         when(task) {
             Tasks.EncoderDrive -> drive(flSpeed, frSpeed, rlSpeed, rrSpeed, inches, true)
             Tasks.Rightgyro -> rightGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target, true)
@@ -356,28 +355,25 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         isBusy = false
     }
 
-    override fun toString(): String {
-        return "" + 
-            "FrontLeft: \n" + 
-            "\tTarget Power: ${FrontLeft.power}\n" +
-            "\tCurrent Power: ${FrontLeft.rawPower}\n" + 
-            "\tTarget Clicks: ${FrontLeft.target}\n" + 
-            "\tCurrent Clicks: ${FrontLeft.currentPosition}\n" + 
-            "FrontRight: \n" +
-            "\tTarget Power: ${FrontRight.power}\n" +
-            "\tCurrent Power: ${FrontRight.rawPower}\n" + 
-            "\tTarget Clicks: ${FrontRight.target}\n" + 
-            "\tCurrent Clicks: ${FrontRight.currentPosition}\n" + 
-            "RearLeft: \n" + 
-            "\tTarget Power: ${RearLeft.power}\n" +
-            "\tCurrent Power: ${RearLeft.rawPower}\n" + 
-            "\tTarget Clicks: ${RearLeft.target}\n" + 
-            "\tCurrent Clicks: ${RearLeft.currentPosition}\n" + 
-            "RearRight: \n" + 
-            "\tTarget Power: ${RearRight.power}\n" +
-            "\tCurrent Power: ${RearRight.rawPower}\n" + 
-            "\tTarget Clicks: ${RearRight.target}\n" + 
-            "\tCurrent Clicks: ${RearRight.currentPosition}\n" 
-        
-    }
+    override fun toString(): String =
+        "frontLeft: \n" + 
+        "\tTarget Power: ${frontLeft.power}\n" +
+        "\tCurrent Power: ${frontLeft.rawPower}\n" + 
+        "\tTarget Clicks: ${frontLeft.target}\n" + 
+        "\tCurrent Clicks: ${frontLeft.currentPosition}\n" + 
+        "frontRight: \n" +
+        "\tTarget Power: ${frontRight.power}\n" +
+        "\tCurrent Power: ${frontRight.rawPower}\n" + 
+        "\tTarget Clicks: ${frontRight.target}\n" + 
+        "\tCurrent Clicks: ${frontRight.currentPosition}\n" + 
+        "rearLeft: \n" + 
+        "\tTarget Power: ${rearLeft.power}\n" +
+        "\tCurrent Power: ${rearLeft.rawPower}\n" + 
+        "\tTarget Clicks: ${rearLeft.target}\n" + 
+        "\tCurrent Clicks: ${rearLeft.currentPosition}\n" + 
+        "rearRight: \n" + 
+        "\tTarget Power: ${rearRight.power}\n" +
+        "\tCurrent Power: ${rearRight.rawPower}\n" + 
+        "\tTarget Clicks: ${rearRight.target}\n" + 
+        "\tCurrent Clicks: ${rearRight.currentPosition}\n" 
 } 
