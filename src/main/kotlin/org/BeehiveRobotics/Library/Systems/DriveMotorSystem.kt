@@ -13,9 +13,9 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
     protected val FrontRight: Motor = Motor(opMode, "fr")
     protected val RearLeft: Motor = Motor(opMode, "rl")
     protected val RearRight: Motor = Motor(opMode, "rr")
-    protected val Gyro: REVIMU = REVIMU(opMode)
+    protected val gyro: REVIMU = REVIMU(opMode)
     protected var heading: Double = 0.0
-        get() = Gyro.heading
+        get() = gyro.heading
         private set
     protected val GYRO_LATENCY_OFFSET: Double = 2.75
     protected val GYRO_SLOW_MODE_OFFSET: Double = 10.0
@@ -83,7 +83,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         LEFT, RIGHT
     }
     private enum class Tasks {
-        EncoderDrive, RightGyro, LeftGyro, Stop
+        EncoderDrive, Rightgyro, Leftgyro, Stop
     }
 
     override fun init() {
@@ -102,7 +102,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         this.runMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
         resetEncoders()
         this.model = model
-        Gyro.calibrate()
+        gyro.calibrate()
     }
 
     protected fun drive(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, inches: Double, waitForCompletion: Boolean = true) {
@@ -128,7 +128,8 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
                     stopMotors()
                     return
                 }
-                //opMode.showLine(toString()) //Enable this line for information on each of the motors
+                //opMode.dashboard.addLine(toString()) //Enable these 2 lines for information on each of the motors
+                //opMode.dashboard.update()
             }
             stopMotors()
             isBusy = false
@@ -142,7 +143,6 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
     fun drive(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double) = setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
     fun drive(leftSpeed: Double, rightSpeed: Double) = setRawPowers(leftSpeed, rightSpeed, leftSpeed, rightSpeed)
 
-
     protected fun rightGyro(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, target: Double, waitForCompletion: Boolean = true) {
         isBusy = true
         this.flSpeed = flSpeed
@@ -152,7 +152,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         this.target = target
         val adjustedTarget: Double = calculateAdjustedTarget(target, TurnDirection.RIGHT)
         val finalTarget: Double = calculateFinalTarget(target, TurnDirection.RIGHT)
-        this.heading = Gyro.heading
+        this.heading = gyro.heading
         var derivative: Double = 0.0
         if(waitForCompletion) {
             setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
@@ -166,11 +166,11 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
                     }
                     derivative = current - last
                     last = current
-                    current = Gyro.heading
+                    current = gyro.heading
                 }
             }
             sleep(100)
-            val start: Double = Gyro.heading
+            val start: Double = gyro.heading
             val distance: Double = adjustedTarget - start
             var proportion: Double
             heading = start
@@ -179,7 +179,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
                     stopMotors()
                     return
                 }
-                heading = Gyro.heading
+                heading = gyro.heading
                 proportion = calculateProportion(heading.toDouble(), start.toDouble(), distance)
                 setRawPowers(flSpeed * proportion, frSpeed * proportion, rlSpeed * proportion, rrSpeed * proportion)
             }
@@ -192,14 +192,14 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
                     stopMotors()
                     return
                 }
-                heading = Gyro.heading
+                heading = gyro.heading
                 setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
             }
             stopMotors()
             isBusy = false
 
         } else {
-            this.task = Tasks.RightGyro
+            this.task = Tasks.Rightgyro
             val thread: Thread = Thread(this)
             thread.start()
         }
@@ -214,7 +214,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         this.target = target
         val adjustedTarget: Double = calculateAdjustedTarget(target, TurnDirection.RIGHT)
         val finalTarget: Double = calculateFinalTarget(target, TurnDirection.RIGHT)
-        this.heading = Gyro.heading
+        this.heading = gyro.heading
         var derivative: Double = 0.0
         if(waitForCompletion) {
             setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
@@ -228,11 +228,11 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
                     }
                     derivative = current - last
                     last = current
-                    current = Gyro.heading
+                    current = gyro.heading
                 }
             }
             sleep(100)
-            val start: Double = Gyro.heading
+            val start: Double = gyro.heading
             val distance: Double = adjustedTarget - start
             var proportion: Double
             heading = start
@@ -241,7 +241,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
                     stopMotors()
                     return
                 }
-                heading = Gyro.heading
+                heading = gyro.heading
                 proportion = calculateProportion(heading.toDouble(), start.toDouble(), distance)
                 setRawPowers(flSpeed * proportion, frSpeed * proportion, rlSpeed * proportion, rrSpeed * proportion)
             }
@@ -254,13 +254,13 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
                     stopMotors()
                     return
                 }
-                heading = Gyro.heading
+                heading = gyro.heading
                 setRawPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
             }
             stopMotors()
             isBusy = false
         } else {
-            this.task = Tasks.LeftGyro
+            this.task = Tasks.Leftgyro
             val thread: Thread = Thread(this)
             thread.start()
         }
@@ -349,8 +349,8 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         opMode.dashboard.addLine("Multi-thread ID: ${Thread.currentThread().id}") //Use  this line to display the thread id of drivemotorsystem multi-threading
         when(task) {
             Tasks.EncoderDrive -> drive(flSpeed, frSpeed, rlSpeed, rrSpeed, inches, true)
-            Tasks.RightGyro -> rightGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target, true)
-            Tasks.LeftGyro -> leftGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target, true)
+            Tasks.Rightgyro -> rightGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target, true)
+            Tasks.Leftgyro -> leftGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target, true)
             Tasks.Stop -> stopMotors()
         }
         isBusy = false
@@ -358,26 +358,26 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
 
     override fun toString(): String {
         return "" + 
-        "FrontLeft: " + "\n" + 
-        "\t" + "Target Power: " + FrontLeft.power + "\n"+ 
-        "\t" + "Current Power: " + FrontLeft.rawPower + "\n" + 
-        "\t" + "Target Clicks: " + FrontLeft.target + "\n" + 
-        "\t" + "Current Clicks: " + FrontLeft.currentPosition + "\n" + 
-        "FrontRight: " + "\n" + 
-        "\t" + "Target Power: " + FrontRight.power + "\n" +
-        "\t" + "Current Power: " + FrontRight.rawPower + "\n" + 
-        "\t" + "Target Clicks: " + FrontRight.target + "\n" + 
-        "\t" + "Current Clicks: " + FrontRight.currentPosition + "\n" + 
-        "RearLeft: " + "\n" + 
-        "\t" + "Target Power: " + RearLeft.power + "\n" + 
-        "\t" + "Current Power: " + RearLeft.rawPower + "\n" + 
-        "\t" + "Target Clicks: " + RearLeft.target + "\n" + 
-        "\t" + "Current Clicks: " + RearLeft.currentPosition + "\n" + 
-        "RearRight: " + "\n" + 
-        "\t" + "Target Power: " + RearRight.power + "\n" + 
-        "\t" + "Current Power: " + RearRight.rawPower + "\n" + 
-        "\t" + "Target Clicks: " + RearRight.target + "\n" + 
-        "\t" + "Current Clicks: " + RearRight.currentPosition + "\n"
+            "FrontLeft: \n" + 
+            "\tTarget Power: ${FrontLeft.power}\n" +
+            "\tCurrent Power: ${FrontLeft.rawPower}\n" + 
+            "\tTarget Clicks: ${FrontLeft.target}\n" + 
+            "\tCurrent Clicks: ${FrontLeft.currentPosition}\n" + 
+            "FrontRight: \n" +
+            "\tTarget Power: ${FrontRight.power}\n" +
+            "\tCurrent Power: ${FrontRight.rawPower}\n" + 
+            "\tTarget Clicks: ${FrontRight.target}\n" + 
+            "\tCurrent Clicks: ${FrontRight.currentPosition}\n" + 
+            "RearLeft: \n" + 
+            "\tTarget Power: ${RearLeft.power}\n" +
+            "\tCurrent Power: ${RearLeft.rawPower}\n" + 
+            "\tTarget Clicks: ${RearLeft.target}\n" + 
+            "\tCurrent Clicks: ${RearLeft.currentPosition}\n" + 
+            "RearRight: \n" + 
+            "\tTarget Power: ${RearRight.power}\n" +
+            "\tCurrent Power: ${RearRight.rawPower}\n" + 
+            "\tTarget Clicks: ${RearRight.target}\n" + 
+            "\tCurrent Clicks: ${RearRight.currentPosition}\n" 
         
     }
 } 
