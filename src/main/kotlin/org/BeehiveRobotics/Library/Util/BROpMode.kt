@@ -3,7 +3,7 @@ package org.BeehiveRobotics.Library.Util
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import org.BeehiveRobotics.Library.Util.Controller
 
-abstract class BROpMode(private val opModeType: OpModeType): LinearOpMode() {
+abstract class BROpMode(val opModeType: OpModeType): LinearOpMode() {
 
     protected lateinit var controller1: Controller
     protected lateinit var controller2: Controller
