@@ -26,90 +26,64 @@ class Controller(private val gamepad: Gamepad) {
     private var dpadLeftCountOn = 0
     private var dpadRightCountOn = 0
 
-    var leftStickX = 0.0
-        private set
+    val leftStickX: Double
         get() = gamepad.left_stick_x.toDouble()
-    var leftStickY = 0.0
-        private set
+    val leftStickY: Double
         get() = -gamepad.left_stick_y.toDouble()
-    var rightStickX = 0.0
-        private set
+    val rightStickX: Double
         get() = gamepad.right_stick_x.toDouble()
-    var rightStickY = 0.0
-        private set
+    val rightStickY: Double
         get() = -gamepad.right_stick_y.toDouble()
 
-    var leftTrigger = 0.0
-        private set
+    val leftTrigger: Double
         get() = gamepad.left_trigger.toDouble()
-    var rightTrigger = 0.0
-        private set
+    val rightTrigger: Double
         get() = gamepad.right_trigger.toDouble()
 
-    var leftBumper = false
-        private set
+    val leftBumper: Boolean
         get() = gamepad.left_bumper
-    var rightBumper = false
-        private set
+    val rightBumper: Boolean
         get() = gamepad.right_bumper
 
-    var dpadUp = false
-        private set
+    val dpadUp: Boolean
         get() = gamepad.dpad_up
-    var dpadDown = false
-        private set
+    val dpadDown: Boolean
         get() = gamepad.dpad_down
-    var dpadLeft = false
-        private set
+    val dpadLeft: Boolean
         get() = gamepad.dpad_left
-    var dpadRight = false
-        private set
+    val dpadRight: Boolean
         get() = gamepad.dpad_right
 
-    var a = false
-        private set
+    val a: Boolean
         get() = gamepad.a
-    var b = false
-        private set
+    val b: Boolean
         get() = gamepad.b
-    var x = false
-        private set
+    val x: Boolean
         get() = gamepad.x
-    var y = false
-        private set
+    val y: Boolean
         get() = gamepad.y
 
-    var aToggle = false
-        private set
+    val aToggle: Boolean
         get() = aCountOn == DEBOUNCING_NUMBER_OF_SAMPLES
-    var bToggle = false
-        private set
+    val bToggle: Boolean
         get() = bCountOn == DEBOUNCING_NUMBER_OF_SAMPLES
-    var xToggle = false
-        private set
+    val xToggle: Boolean
         get() = xCountOn == DEBOUNCING_NUMBER_OF_SAMPLES
-    var yToggle = false
-        private set
+    val yToggle: Boolean
         get() = yCountOn == DEBOUNCING_NUMBER_OF_SAMPLES
 
-    var leftBumperToggle = false
-        private set
+    val leftBumperToggle: Boolean
         get() = leftBumperCountOn == DEBOUNCING_NUMBER_OF_SAMPLES
-    var rightBumperToggle = false
-        private set
+    val rightBumperToggle: Boolean
         get() = rightBumperCountOn == DEBOUNCING_NUMBER_OF_SAMPLES
 
-    var dpadUpToggle = false
-        private set
+    val dpadUpToggle: Boolean
         get() = dpadUpCountOn == DEBOUNCING_NUMBER_OF_SAMPLES
-    var dpadDownToggle = false
-        private set
+    val dpadDownToggle: Boolean
         get() = dpadDownCountOn == DEBOUNCING_NUMBER_OF_SAMPLES
-    var dpadLeftToggle = false
-        private set
+    val dpadLeftToggle: Boolean
         get() = dpadLeftCountOn == DEBOUNCING_NUMBER_OF_SAMPLES
-    var dpadRightToggle = false
-        private set
+    val dpadRightToggle: Boolean
         get() = dpadRightCountOn == DEBOUNCING_NUMBER_OF_SAMPLES
 
     fun update() {
@@ -135,21 +109,5 @@ class Controller(private val gamepad: Gamepad) {
         else dpadLeftCountOn = 0
         if(dpadRight) dpadRightCountOn++
         else dpadRightCountOn = 0
-        
-        
-        /*
-        aPrev = a
-        bPrev = b
-        xPrev = x
-        yPrev = y
-
-        leftBumperPrev = leftBumper
-        rightBumperPrev = rightBumper
-
-        dpadUpPrev = dpadUp
-        dpadDownPrev = dpadDown
-        dpadLeftPrev = dpadLeft
-        dpadRightPrev = dpadRight
-        */
     }
 }
