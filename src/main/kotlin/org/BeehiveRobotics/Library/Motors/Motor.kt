@@ -24,6 +24,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
             this.current = currentPosition
             field = Math.abs(target)
         }
+    var time = 0L
     private var current = 0.0
     var power = 0.0
         set(value) {
@@ -37,6 +38,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
             else stopMotor()
             field = value
         }
+    var targetPower = 0.0
     private var task = Tasks.Stop
     var runMode: DcMotor.RunMode
         set(runMode) {
@@ -72,7 +74,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
     }
 
     enum class Tasks {
-        RunToPosition, Stop
+        RunToPosition, RunForTime, Stop
     }
     
     init {
@@ -89,10 +91,10 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
         return this
     }
 
-    fun runToPosition(target: Double, power: Double, waitForCompletion: Boolean = true) {
+    fun runToPosition(target: Double, targetPower: Double, waitForCompletion: Boolean = true) {
         isBusy = true
         this.target = Math.abs(target)
-        this.power = power
+        this.targetPower = power
         if (!waitForCompletion) {
             task = Tasks.RunToPosition
             val thread = Thread(this)
@@ -102,9 +104,26 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
                 if(!opMode.opModeIsActive()) {
                     return
                 }
-                this.power = power
+                this.power = targetPower
             }
             stopMotor()
+        }
+        isBusy = false
+    }
+
+    fun runForTime(targetPower: Double, time: Long, waitForCompletion: Boolean = true) {
+        isBusy = true
+        this.time = time
+        this.targetPower = targetPower
+        if(!waitForCompletion) {
+            task = Tasks.RunForTime
+            val thread = Thread(this)
+            thread.start()
+        } else {
+            val runTime = ElapsedTime()
+            this.rawPower = targetPower
+            while(runTime.milliseconds()<this.time) if(!opMode.opModeIsActive()) continue
+            this.stopMotor()
         }
         isBusy = false
     }
@@ -126,9 +145,18 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
             Tasks.RunToPosition -> {
                 while(!this.isAtTarget()) {
                     if(!opMode.opModeIsActive()) return                    
-                    this.power = this.power
+                    this.power = this.targetPower
                 }
                 this.stopMotor()
+                task = Tasks.Stop
+                Thread.currentThread().interrupt()
+            }
+            Tasks.RunForTime -> {
+                val runTime = ElapsedTime()
+                this.rawPower = targetPower
+                while(runTime.milliseconds()<this.time) if(!opMode.opModeIsActive()) continue
+                this.stopMotor()
+                task = Tasks.Stop
                 Thread.currentThread().interrupt()
             }
             Tasks.Stop -> this.stopMotor()            
