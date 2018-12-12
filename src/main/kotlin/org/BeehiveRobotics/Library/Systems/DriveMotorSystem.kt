@@ -38,12 +38,20 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
             field = speed
         }
     protected var MAX_SPEED: Double = 1.0
-        protected set(speed) {
-            frontLeft.MAX_SPEED = MAX_SPEED
-            frontRight.MAX_SPEED = MAX_SPEED
-            rearLeft.MAX_SPEED = MAX_SPEED
-            rearRight.MAX_SPEED = MAX_SPEED
-            field = speed
+        protected set(value) {
+            frontLeft.MAX_SPEED = value
+            frontRight.MAX_SPEED = value
+            rearLeft.MAX_SPEED = value
+            rearRight.MAX_SPEED = value
+            field = value
+        }
+    protected var RAMPING_COEFFICIENT: Double = 0.8
+        protected set(value) {
+            frontLeft.RAMPING_COEFFICIENT = value
+            frontRight.RAMPING_COEFFICIENT = value
+            rearLeft.RAMPING_COEFFICIENT = value
+            rearRight.RAMPING_COEFFICIENT = value
+            field = value
         }
     var zeroPowerBehavior: DcMotor.ZeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
         set(zeroPowerBehavior) {
