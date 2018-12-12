@@ -91,9 +91,9 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
         return this
     }
 
-    fun runToPosition(target: Double, targetPower: Double, waitForCompletion: Boolean = true) {
+    fun runToPosition(targetPower: Double, targetClicks: Double, waitForCompletion: Boolean = true) {
         isBusy = true
-        this.target = Math.abs(target)
+        this.target = Math.abs(targetClicks)
         this.targetPower = power
         if (!waitForCompletion) {
             task = Tasks.RunToPosition
