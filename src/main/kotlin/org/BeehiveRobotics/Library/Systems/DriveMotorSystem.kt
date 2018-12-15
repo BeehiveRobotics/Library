@@ -53,6 +53,15 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
             rearRight.RAMPING_COEFFICIENT = value
             field = value
         }
+    /*var RAMP_CLICKS_PROPORTION: Double = 0.5
+        set(value) {
+            frontLeft.RAMP_CLICKS_PROPORTION = value
+            frontRight.RAMP_CLICKS_PROPORTION = value
+            rearLeft.RAMP_CLICKS_PROPORTION = value
+            rearRight.RAMP_CLICKS_PROPORTION = value
+            field = value
+        }
+    */
     var zeroPowerBehavior: DcMotor.ZeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
         set(zeroPowerBehavior) {
             this.frontLeft.zeroPowerBehavior = zeroPowerBehavior
@@ -119,6 +128,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         this.rlSpeed = rlSpeed
         this.rrSpeed = rrSpeed
         this.inches = inches
+        //this.RAMPING_COEFFICIENT = -0.015*inches + 1.5
         resetEncoders()
         val clicks: Double = inches_to_clicks(inches)
         val highestPower: Double = Math.max(listOf(Math.abs(flSpeed), Math.abs(frSpeed), Math.abs(rlSpeed), Math.abs(rrSpeed)).max() ?: java.lang.Double.MIN_VALUE, java.lang.Double.MIN_VALUE)
@@ -127,16 +137,15 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         val rlTarget: Double = clicks * rlSpeed / highestPower
         val rrTarget: Double = clicks * rrSpeed / highestPower
         setTargets(flTarget, frTarget, rlTarget, rrTarget)
-        setPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
+        //setContantRampPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
         if(waitForCompletion) {
             while(!allMotorsAtTarget()) {
-                setPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
+                setPiecewiseRampPowers(flSpeed, frSpeed, rlSpeed, rrSpeed)
                 if(!opMode.opModeIsActive()) {
                     stopMotors()
                     return
                 }
-                //opMode.dashboard.addLine(toString()) //Enable these 2 lines for information on each of the motors
-                //opMode.dashboard.update()
+                //opMode.dashboard.showLine(toString()) //Enable these 2 lines for information on each of the motors
             }
             stopMotors()
             isBusy = false
@@ -286,14 +295,21 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         this.gearedType = gearedType
         return this
     }
-
+    
     protected fun allMotorsAtTarget(): Boolean = frontLeft.isAtTarget() && frontRight.isAtTarget() && rearLeft.isAtTarget() && rearRight.isAtTarget()
 
-    protected fun setPowers(fl: Double, fr: Double, rl: Double, rr: Double) {
-        frontLeft.power = fl
-        frontRight.power = fr
-        rearLeft.power = rl
-        rearRight.power = rr
+    protected fun setContantRampPowers(fl: Double, fr: Double, rl: Double, rr: Double) {
+        frontLeft.constantRampPower = fl
+        frontRight.constantRampPower = fr
+        rearLeft.constantRampPower = rl
+        rearRight.constantRampPower = rr
+    }
+
+    protected fun setPiecewiseRampPowers(fl: Double, fr: Double, rl: Double, rr: Double) {
+        frontLeft.piecewiseRampPower = fl
+        frontRight.piecewiseRampPower = fr
+        rearLeft.piecewiseRampPower = rl
+        rearRight.piecewiseRampPower = rr
     }
 
     protected fun setRawPowers(fl: Double, fr: Double, rl: Double, rr: Double) {
@@ -329,7 +345,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         }
     }
 
-    fun avgSpeed() = (Math.abs(frontLeft.power) + Math.abs(frontRight.power) + Math.abs(rearLeft.power) + Math.abs(rearRight.power)) / 4
+    fun avgSpeed() = (Math.abs(frontLeft.targetPower) + Math.abs(frontRight.targetPower) + Math.abs(rearLeft.targetPower) + Math.abs(rearRight.targetPower)) / 4
 
     protected fun calculateAdjustedTarget(target: Double, direction: TurnDirection): Double {
         when(direction) {
@@ -365,22 +381,22 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
 
     override fun toString(): String =
         "frontLeft: \n" + 
-        "\tTarget Power: ${frontLeft.power}\n" +
+        "\tTarget Power: ${frontLeft.targetPower}\n" +
         "\tCurrent Power: ${frontLeft.rawPower}\n" + 
         "\tTarget Clicks: ${frontLeft.target}\n" + 
         "\tCurrent Clicks: ${frontLeft.currentPosition}\n" + 
         "frontRight: \n" +
-        "\tTarget Power: ${frontRight.power}\n" +
+        "\tTarget Power: ${frontRight.targetPower}\n" +
         "\tCurrent Power: ${frontRight.rawPower}\n" + 
         "\tTarget Clicks: ${frontRight.target}\n" + 
         "\tCurrent Clicks: ${frontRight.currentPosition}\n" + 
         "rearLeft: \n" + 
-        "\tTarget Power: ${rearLeft.power}\n" +
+        "\tTarget Power: ${rearLeft.targetPower}\n" +
         "\tCurrent Power: ${rearLeft.rawPower}\n" + 
         "\tTarget Clicks: ${rearLeft.target}\n" + 
         "\tCurrent Clicks: ${rearLeft.currentPosition}\n" + 
         "rearRight: \n" + 
-        "\tTarget Power: ${rearRight.power}\n" +
+        "\tTarget Power: ${rearRight.targetPower}\n" +
         "\tCurrent Power: ${rearRight.rawPower}\n" + 
         "\tTarget Clicks: ${rearRight.target}\n" + 
         "\tCurrent Clicks: ${rearRight.currentPosition}\n" 
