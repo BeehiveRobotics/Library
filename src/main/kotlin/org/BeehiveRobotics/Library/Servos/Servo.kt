@@ -47,7 +47,7 @@ class Servo(private val opMode: BROpMode, val name: String, var targetPosition: 
             val CPPI = PPI*speed //calculated ppi, taking into account speed
             position = if(targetPosition<position) position - CPPI else if(targetPosition>position) position + CPPI else position
             sleep(((index * increment) - time.milliseconds()).toLong())
-            index.inc()
+            index++
             if(position == targetPosition) index = 1
         }
     } 

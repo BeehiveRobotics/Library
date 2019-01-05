@@ -62,7 +62,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
     private var task = Tasks.Stop
     var runMode: DcMotor.RunMode
         set(runMode) {
-            this.motor.mode = runMode
+            this.motor.mode = runMode                                                 
         }
         get() = this.motor.mode
     var model = MotorModel.NEVEREST40
