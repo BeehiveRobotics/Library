@@ -299,24 +299,24 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
     protected fun allMotorsAtTarget(): Boolean = frontLeft.isAtTarget() && frontRight.isAtTarget() && rearLeft.isAtTarget() && rearRight.isAtTarget()
 
     protected fun setContantRampPowers(fl: Double, fr: Double, rl: Double, rr: Double) {
-        frontLeft.constantRampPower = fl
-        frontRight.constantRampPower = fr
-        rearLeft.constantRampPower = rl
-        rearRight.constantRampPower = rr
+        frontLeft.power = fl
+        frontRight.power = fr
+        rearLeft.power = rl
+        rearRight.power = rr
     }
 
     protected fun setPiecewiseRampPowers(fl: Double, fr: Double, rl: Double, rr: Double) {
-        frontLeft.piecewiseRampPower = fl
-        frontRight.piecewiseRampPower = fr
-        rearLeft.piecewiseRampPower = rl
-        rearRight.piecewiseRampPower = rr
+        frontLeft.power = fl
+        frontRight.power = fr
+        rearLeft.power = rl
+        rearRight.power = rr
     }
 
     protected fun setRawPowers(fl: Double, fr: Double, rl: Double, rr: Double) {
-        frontLeft.rawPower = fl
-        frontRight.rawPower = fr
-        rearLeft.rawPower = rl
-        rearRight.rawPower = rr
+        frontLeft.power = fl
+        frontRight.power = fr
+        rearLeft.power = rl
+        rearRight.power = rr
     }
 
     internal fun setTargets(fl: Double, fr: Double, rl: Double, rr: Double) {
@@ -382,22 +382,22 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
     override fun toString(): String =
         "frontLeft: \n" + 
         "\tTarget Power: ${frontLeft.targetPower}\n" +
-        "\tCurrent Power: ${frontLeft.rawPower}\n" + 
+        "\tCurrent Power: ${frontLeft.power}\n" + 
         "\tTarget Clicks: ${frontLeft.target}\n" + 
         "\tCurrent Clicks: ${frontLeft.currentPosition}\n" + 
         "frontRight: \n" +
         "\tTarget Power: ${frontRight.targetPower}\n" +
-        "\tCurrent Power: ${frontRight.rawPower}\n" + 
+        "\tCurrent Power: ${frontRight.power}\n" + 
         "\tTarget Clicks: ${frontRight.target}\n" + 
         "\tCurrent Clicks: ${frontRight.currentPosition}\n" + 
         "rearLeft: \n" + 
         "\tTarget Power: ${rearLeft.targetPower}\n" +
-        "\tCurrent Power: ${rearLeft.rawPower}\n" + 
+        "\tCurrent Power: ${rearLeft.power}\n" + 
         "\tTarget Clicks: ${rearLeft.target}\n" + 
         "\tCurrent Clicks: ${rearLeft.currentPosition}\n" + 
         "rearRight: \n" + 
         "\tTarget Power: ${rearRight.targetPower}\n" +
-        "\tCurrent Power: ${rearRight.rawPower}\n" + 
+        "\tCurrent Power: ${rearRight.power}\n" + 
         "\tTarget Clicks: ${rearRight.target}\n" + 
         "\tCurrent Clicks: ${rearRight.currentPosition}\n" 
 } 
