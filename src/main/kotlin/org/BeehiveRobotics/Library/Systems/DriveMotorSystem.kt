@@ -8,20 +8,20 @@ import com.qualcomm.robotcore.util.ElapsedTime
 import org.BeehiveRobotics.Library.Sensors.REVIMU
 
 abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var gearedType: GearedType = GearedType.NORMAL, private val gearRatio: Double = 1.0): RobotSystem(opMode), Runnable {
-    protected val frontLeft: Motor = Motor(opMode, "fl")
-    protected val frontRight: Motor = Motor(opMode, "fr")
-    protected val rearLeft: Motor = Motor(opMode, "rl")
-    protected val rearRight: Motor = Motor(opMode, "rr")
-    protected val gyro: REVIMU = REVIMU(opMode)
-    protected var heading: Double = 0.0
+    protected val frontLeft = Motor(opMode, "fl")
+    protected val frontRight = Motor(opMode, "fr")
+    protected val rearLeft = Motor(opMode, "rl")
+    protected val rearRight = Motor(opMode, "rr")
+    protected val gyro = REVIMU(opMode)
+    protected var heading = 0.0
         get() = gyro.heading
         private set
-    protected val GYRO_LATENCY_OFFSET: Double = 2.75
-    protected val GYRO_SLOW_MODE_OFFSET: Double = 10.0
-    protected var CPR: Double = 1120.0
+    protected val GYRO_LATENCY_OFFSET = 2.75
+    protected val GYRO_SLOW_MODE_OFFSET = 10.0
+    protected var CPR = 1120.0
         private set
-    var model: Motor.MotorModel = Motor.MotorModel.NEVEREST40
-        set(model: Motor.MotorModel) {
+    var model = Motor.MotorModel.NEVEREST40
+        set(model) {
             frontLeft.model = model
             frontRight.model = model
             rearLeft.model = model
@@ -53,15 +53,6 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
             rearRight.RAMPING_COEFFICIENT = value
             field = value
         }
-    /*var RAMP_CLICKS_PROPORTION: Double = 0.5
-        set(value) {
-            frontLeft.RAMP_CLICKS_PROPORTION = value
-            frontRight.RAMP_CLICKS_PROPORTION = value
-            rearLeft.RAMP_CLICKS_PROPORTION = value
-            rearRight.RAMP_CLICKS_PROPORTION = value
-            field = value
-        }
-    */
     var zeroPowerBehavior: DcMotor.ZeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
         set(zeroPowerBehavior) {
             this.frontLeft.zeroPowerBehavior = zeroPowerBehavior
@@ -99,11 +90,11 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         LEFT, RIGHT
     }
     private enum class Tasks {
-        EncoderDrive, Rightgyro, Leftgyro, Stop
+        EncoderDrive, RightGyro, LeftGyro, Stop
     }
 
     override fun init() {
-        if (gearedType == GearedType.NORMAL) {
+        if (gearedType == GearedType.REVERSE) {
             frontLeft.direction = DcMotorSimple.Direction.REVERSE
             rearLeft.direction = DcMotorSimple.Direction.REVERSE
             frontRight.direction = DcMotorSimple.Direction.FORWARD
@@ -215,7 +206,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
             isBusy = false
 
         } else {
-            this.task = Tasks.Rightgyro
+            this.task = Tasks.RightGyro
             val thread: Thread = Thread(this)
             thread.start()
         }
@@ -276,7 +267,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
             stopMotors()
             isBusy = false
         } else {
-            this.task = Tasks.Leftgyro
+            this.task = Tasks.LeftGyro
             val thread: Thread = Thread(this)
             thread.start()
         }
@@ -326,6 +317,14 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         rearRight.target = rr
     }
 
+    internal fun setRampingTypes(all: Motor.RampingType) {
+        frontLeft.rampingType = all
+        frontRight.rampingType = all
+        rearLeft.rampingType = all
+        rearRight.rampingType = all
+
+    }
+
     internal fun inches_to_clicks(inches: Double): Double {
         val circumference = WHEEL_DIAMETER * Math.PI
         return CPR / circumference * inches / gearRatio
@@ -372,30 +371,30 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         //opMode.dashboard.addLine("Multi-thread ID: ${Thread.currentThread().id}") //Use  this line to display the thread id of drivemotorsystem multi-threading
         when(task) {
             Tasks.EncoderDrive -> drive(flSpeed, frSpeed, rlSpeed, rrSpeed, inches, true)
-            Tasks.Rightgyro -> rightGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target, true)
-            Tasks.Leftgyro -> leftGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target, true)
+            Tasks.RightGyro -> rightGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target, true)
+            Tasks.LeftGyro -> leftGyro(flSpeed, frSpeed, rlSpeed, rrSpeed, target, true)
             Tasks.Stop -> stopMotors()
         }
         isBusy = false
     }
 
     override fun toString(): String =
-        "frontLeft: \n" + 
+        "FrontLeft: \n" + 
         "\tTarget Power: ${frontLeft.targetPower}\n" +
         "\tCurrent Power: ${frontLeft.power}\n" + 
         "\tTarget Clicks: ${frontLeft.target}\n" + 
         "\tCurrent Clicks: ${frontLeft.currentPosition}\n" + 
-        "frontRight: \n" +
+        "FrontRight: \n" +
         "\tTarget Power: ${frontRight.targetPower}\n" +
         "\tCurrent Power: ${frontRight.power}\n" + 
         "\tTarget Clicks: ${frontRight.target}\n" + 
         "\tCurrent Clicks: ${frontRight.currentPosition}\n" + 
-        "rearLeft: \n" + 
+        "RearLeft: \n" + 
         "\tTarget Power: ${rearLeft.targetPower}\n" +
         "\tCurrent Power: ${rearLeft.power}\n" + 
         "\tTarget Clicks: ${rearLeft.target}\n" + 
         "\tCurrent Clicks: ${rearLeft.currentPosition}\n" + 
-        "rearRight: \n" + 
+        "RearRight: \n" + 
         "\tTarget Power: ${rearRight.targetPower}\n" +
         "\tCurrent Power: ${rearRight.power}\n" + 
         "\tTarget Clicks: ${rearRight.target}\n" + 

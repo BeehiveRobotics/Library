@@ -28,7 +28,10 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
     private var current = 0.0
     var power
         set(value) {
-            if(value==0.0) return
+            if(value==0.0 || !opMode.opModeIsActive()) {
+                motor.power = 0.0
+                return
+            }
             when(rampingType) {
                 RampingType.None -> {
                     motor.power = value
@@ -41,7 +44,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
                     if(value < 0) motor.power = -expoPower
                     if(value > 0) motor.power = expoPower
                 }
-                RampingType.Parabola -> {
+                RampingType.Piecewise -> {
                     current = currentPosition
                     if(target < RAMP_CLICKS_PROPORTION*CPR) {
                         motor.power = value
@@ -99,7 +102,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
     }
 
     enum class RampingType {
-        None, ConstantJerk, Parabola
+        None, ConstantJerk, Piecewise
     }
     var rampingType = RampingType.None
     

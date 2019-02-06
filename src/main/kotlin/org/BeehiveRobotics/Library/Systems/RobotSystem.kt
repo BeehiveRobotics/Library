@@ -5,7 +5,7 @@ import org.BeehiveRobotics.Library.Robots.Robot
 import com.qualcomm.robotcore.util.ElapsedTime
 
 abstract class RobotSystem(private val opMode: BROpMode) {
-    var isBusy = false
+    open var isBusy = false
         protected set
     fun waitUntilNotBusy() {
         while(opMode.opModeIsActive() && isBusy) {}
