@@ -15,7 +15,7 @@ class REVColorSensor(private val opMode: BROpMode, val name: String) {
     var blue = 0
         private set
         get() = cs.blue()
-    
+
     fun RGB(): List<Int> {
         return listOf(red, green, blue)
     }
@@ -27,4 +27,10 @@ class REVColorSensor(private val opMode: BROpMode, val name: String) {
     }
 
     fun enableLED(value: Boolean = true) = cs.enableLed(value)
+
+    override fun toString(): String {
+        return "" + 
+            "RGB: ($red, $green, $blue) \n" + 
+            "HSV: (${HSV()[0]}, ${HSV()[1]}, ${HSV()[2]})"
+    }
 }

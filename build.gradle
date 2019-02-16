@@ -4,24 +4,23 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 android {
-
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 28
     }
-
     compileSdkVersion 28
-    buildToolsVersion '28.0.1'
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+    buildToolsVersion '28.0.3'
 }
 repositories {
     flatDir {
         dirs '../libs'
     }
     mavenCentral()
+    google()
 }
 apply from: 'build.release.gradle'
 dependencies {

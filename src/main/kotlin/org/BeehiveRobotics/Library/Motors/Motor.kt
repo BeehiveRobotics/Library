@@ -32,6 +32,10 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
                 motor.power = 0.0
                 return
             }
+            if(target == 0.0) {
+                motor.power = power
+                return
+            }
             when(rampingType) {
                 RampingType.None -> {
                     motor.power = value
@@ -62,6 +66,12 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
                     }
                     motor.power = value
                 }
+                RampingType.LinearDown -> {
+                    current = currentPosition
+                    val calcSpeed = current/target * (Math.abs(value)-MIN_SPEED) + MIN_SPEED
+                    motor.power = if(value>0) calcSpeed else -calcSpeed
+                    return
+                }
             }
         }
         get() = motor.power
@@ -76,6 +86,8 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
     var model = MotorModel.NEVEREST40
     val CPR: Double
         get() = model.CPR
+    val RPM: Double
+        get() = model.RPM
     var currentPosition = 0.0
         private set
         get() = Math.abs(this.motor.currentPosition.toDouble())
@@ -91,10 +103,10 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
         }
         get() = motor.direction
         
-    enum class MotorModel(val CPR: Double) {
-        NEVEREST20(537.6), 
-        NEVEREST40(1120.0), 
-        NEVEREST60(1680.0)
+    enum class MotorModel(val CPR: Double, val RPM: Double) {
+        NEVEREST20(537.6, 333.3), 
+        NEVEREST40(1120.0, 160.0), 
+        NEVEREST60(1680.0, 106.6)
     }
 
     enum class Tasks {
@@ -102,7 +114,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
     }
 
     enum class RampingType {
-        None, ConstantJerk, Piecewise
+        None, ConstantJerk, Piecewise, LinearDown
     }
     var rampingType = RampingType.None
     
@@ -184,7 +196,8 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
             }
             Tasks.RunForTime -> {
                 val runTime = ElapsedTime()
-                this.power = targetPower
+                runTime.reset()
+                this.motor.power = targetPower
                 while(runTime.milliseconds()<this.time) if(!opMode.opModeIsActive()) continue
                 this.stopMotor()
                 task = Tasks.Stop
