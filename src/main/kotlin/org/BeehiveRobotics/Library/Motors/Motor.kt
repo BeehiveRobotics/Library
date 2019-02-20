@@ -8,7 +8,7 @@ import org.BeehiveRobotics.Library.Util.BROpMode
 import org.BeehiveRobotics.Library.Systems.RobotSystem
 
 class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode), Runnable {
-    private val motor: DcMotor = opMode.hardwareMap.get(DcMotor::class.java, name)
+    val motor: DcMotor = opMode.hardwareMap.get(DcMotor::class.java, name)
     var RAMPING_COEFFICIENT = 0.8
     var MIN_SPEED = 0.2
         set(speed) {
@@ -17,6 +17,10 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
     var MAX_SPEED = 1.0
         set(speed) {
             field = Math.abs(speed)
+        }
+    var MAX_NO_SLIP_SPEED = 1.0
+        set(value) {
+            field = Math.abs(value)
         }
     var target = 0.0
         set(target) {
@@ -32,13 +36,11 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
                 motor.power = 0.0
                 return
             }
-            if(target == 0.0) {
-                motor.power = power
-                return
-            }
             when(rampingType) {
                 RampingType.None -> {
+                    this.current = currentPosition
                     motor.power = value
+                    return
                 }
                 RampingType.ConstantJerk -> {
                     this.current = currentPosition
@@ -47,35 +49,47 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
                     val expoPower = Range.clip(Math.pow(Math.abs(calcPower), RAMPING_COEFFICIENT), MIN_SPEED, MAX_SPEED)
                     if(value < 0) motor.power = -expoPower
                     if(value > 0) motor.power = expoPower
+                    return
                 }
                 RampingType.Piecewise -> {
                     current = currentPosition
-                    if(target < RAMP_CLICKS_PROPORTION*CPR) {
-                        motor.power = value
+                    
+                    if(target < RAMP_CLICKS_PROPORTION*CPR*2) { //no room to ramp
+                        val calcSpeed = Math.min(Math.abs(value), MAX_NO_SLIP_SPEED)
+                        motor.power = if(value>0) calcSpeed else -calcSpeed
                         return
                     }
-                    if(current < RAMP_CLICKS_PROPORTION*CPR) {
+                    if(current < RAMP_CLICKS_PROPORTION*CPR) { //Ramp up
                         val calcSpeed = Math.pow(current/CPR, 0.5)*(Math.abs(value)-MIN_SPEED)+MIN_SPEED
                         motor.power = if(value>0) calcSpeed else -calcSpeed
                         return
                     }
-                    if(target - current < RAMP_CLICKS_PROPORTION*CPR) {
-                        val calcSpeed = Math.pow((target-current)/CPR, 0.5)*(Math.abs(value)-MIN_SPEED)+MIN_SPEED
+                    if(current > RAMP_CLICKS_PROPORTION*CPR && target - current > RAMP_CLICKS_PROPORTION*CPR) { //linear period
+                        motor.power = value
+                        return
+                    }
+                    if(target - current < RAMP_CLICKS_PROPORTION*CPR) { //ramp down
+                        val calcSpeed = Math.pow((target-current)/CPR, 0.5)*(Math.abs(value)-0.325) + 0.325
                         motor.power = if(value>0) calcSpeed else -calcSpeed
                         return
                     }
-                    motor.power = value
                 }
                 RampingType.LinearDown -> {
                     current = currentPosition
-                    val calcSpeed = current/target * (Math.abs(value)-MIN_SPEED) + MIN_SPEED
+                    val calcSpeed = (1 - current/target) * (Math.abs(value)-MIN_SPEED) + MIN_SPEED
+                    motor.power = if(value>0) calcSpeed else -calcSpeed
+                    return
+                }
+                RampingType.LinearUp -> {
+                    current = currentPosition
+                    val calcSpeed = (current/target) * (Math.abs(value)-MIN_SPEED) + MIN_SPEED
                     motor.power = if(value>0) calcSpeed else -calcSpeed
                     return
                 }
             }
         }
         get() = motor.power
-    val RAMP_CLICKS_PROPORTION = 0.5
+    var RAMP_CLICKS_PROPORTION = 0.5
     var targetPower = 0.0
     private var task = Tasks.Stop
     var runMode: DcMotor.RunMode
@@ -114,7 +128,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
     }
 
     enum class RampingType {
-        None, ConstantJerk, Piecewise, LinearDown
+        None, ConstantJerk, Piecewise, LinearDown, LinearUp
     }
     var rampingType = RampingType.None
     
@@ -164,7 +178,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
         } else {
             val runTime = ElapsedTime()
             motor.power = targetPower
-            while(runTime.milliseconds()<this.time) if(!opMode.opModeIsActive()) continue
+            while(runTime.milliseconds() < this.time) if(!opMode.opModeIsActive()) continue
             this.stopMotor()
         }
         isBusy = false
@@ -174,7 +188,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
         this.motor.power = 0.0
     }
 
-    fun isAtTarget(): Boolean = Math.abs(currentPosition) >= Math.abs(target)
+    fun isAtTarget(): Boolean = Math.abs(currentPosition) + 30 >= Math.abs(target)
 
     override fun toString(): String =
         "Target clicks: $target\n" + 
