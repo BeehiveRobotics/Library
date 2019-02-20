@@ -18,15 +18,12 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         private set
     protected val GYRO_LATENCY_OFFSET = 2.75
     protected val GYRO_SLOW_MODE_OFFSET = 10.0
-    protected var CPR = 1120.0
-        private set
     var model = Motor.MotorModel.NEVEREST40
         set(model) {
             frontLeft.model = model
             frontRight.model = model
             rearLeft.model = model
             rearRight.model = model
-            this.CPR = model.CPR
             field = model
         }
     protected var MIN_SPEED: Double = 0.25
@@ -45,12 +42,28 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
             rearRight.MAX_SPEED = value
             field = value
         }
+    protected var MAX_NO_SLIP_SPEED = 1.0
+        protected set(value) {
+            frontLeft.MAX_NO_SLIP_SPEED = value
+            frontRight.MAX_NO_SLIP_SPEED = value
+            rearLeft.MAX_NO_SLIP_SPEED = value
+            rearRight.MAX_NO_SLIP_SPEED = value
+            field = value
+        }
     protected var RAMPING_COEFFICIENT: Double = 0.8
         protected set(value) {
             frontLeft.RAMPING_COEFFICIENT = value
             frontRight.RAMPING_COEFFICIENT = value
             rearLeft.RAMPING_COEFFICIENT = value
             rearRight.RAMPING_COEFFICIENT = value
+            field = value
+        }
+    protected var RAMP_CLICKS_PROPORTION: Double = 1.0
+        protected set(value) {
+            frontLeft.RAMP_CLICKS_PROPORTION = value
+            frontRight.RAMP_CLICKS_PROPORTION = value
+            rearLeft.RAMP_CLICKS_PROPORTION = value
+            rearRight.RAMP_CLICKS_PROPORTION = value
             field = value
         }
     var zeroPowerBehavior: DcMotor.ZeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
@@ -109,7 +122,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         this.runMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
         resetEncoders()
         this.model = model
-        gyro.calibrate()
+        if(opMode.opModeType == BROpMode.OpModeType.Autonomous) gyro.calibrate()
     }
 
     protected fun drive(flSpeed: Double, frSpeed: Double, rlSpeed: Double, rrSpeed: Double, inches: Double, waitForCompletion: Boolean = true) {
@@ -136,7 +149,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
                     stopMotors()
                     return
                 }
-                //opMode.dashboard.showLine(toString()) //Enable these 2 lines for information on each of the motors
+                opMode.dashboard.showLine(toString()) //Enable this line for information on each of the motors
             }
             stopMotors()
             isBusy = false
@@ -204,6 +217,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
             }
             stopMotors()
             isBusy = false
+            
 
         } else {
             this.task = Tasks.RightGyro
@@ -304,10 +318,10 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
     }
 
     protected fun setRawPowers(fl: Double, fr: Double, rl: Double, rr: Double) {
-        frontLeft.power = fl
-        frontRight.power = fr
-        rearLeft.power = rl
-        rearRight.power = rr
+        frontLeft.motor.power = fl
+        frontRight.motor.power = fr
+        rearLeft.motor.power = rl
+        rearRight.motor.power = rr
     }
 
     internal fun setTargets(fl: Double, fr: Double, rl: Double, rr: Double) {
@@ -317,7 +331,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         rearRight.target = rr
     }
 
-    internal fun setRampingTypes(all: Motor.RampingType) {
+    fun setRampingTypes(all: Motor.RampingType) {
         frontLeft.rampingType = all
         frontRight.rampingType = all
         rearLeft.rampingType = all
@@ -327,7 +341,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
 
     internal fun inches_to_clicks(inches: Double): Double {
         val circumference = WHEEL_DIAMETER * Math.PI
-        return CPR / circumference * inches / gearRatio
+        return model.CPR / circumference * inches / gearRatio
 
     }
 
