@@ -54,22 +54,22 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
                 RampingType.Piecewise -> {
                     current = currentPosition
                     
-                    if(target < RAMP_CLICKS_PROPORTION*CPR*2) { //no room to ramp
+                    if(target < RAMP_CLICKS_PROPORTION*CPR*2) { 
                         val calcSpeed = Math.min(Math.abs(value), MAX_NO_SLIP_SPEED)
                         motor.power = if(value>0) calcSpeed else -calcSpeed
                         return
                     }
-                    if(current < RAMP_CLICKS_PROPORTION*CPR) { //Ramp up
+                    if(current < RAMP_CLICKS_PROPORTION*CPR) { 
                         val calcSpeed = Math.pow(current/CPR, 0.5)*(Math.abs(value)-MIN_SPEED)+MIN_SPEED
                         motor.power = if(value>0) calcSpeed else -calcSpeed
                         return
                     }
-                    if(current > RAMP_CLICKS_PROPORTION*CPR && target - current > RAMP_CLICKS_PROPORTION*CPR) { //linear period
+                    if(current > RAMP_CLICKS_PROPORTION*CPR && target - current > RAMP_CLICKS_PROPORTION*CPR) { 
                         motor.power = value
                         return
                     }
-                    if(target - current < RAMP_CLICKS_PROPORTION*CPR) { //ramp down
-                        val calcSpeed = Math.pow((target-current)/CPR, 0.5)*(Math.abs(value)-0.325) + 0.325
+                    if(target - current < RAMP_CLICKS_PROPORTION*CPR) { 
+                        val calcSpeed = Math.pow((target-current)/CPR, 0.5)*(Math.abs(value)-MIN_SPEED) + MIN_SPEED
                         motor.power = if(value>0) calcSpeed else -calcSpeed
                         return
                     }
