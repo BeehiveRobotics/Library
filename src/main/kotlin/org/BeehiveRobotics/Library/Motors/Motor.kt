@@ -206,7 +206,6 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
                 this.stopMotor()
                 task = Tasks.Stop
                 isBusy = false
-                Thread.currentThread().interrupt()
             }
             Tasks.RunForTime -> {
                 val runTime = ElapsedTime()
@@ -216,9 +215,9 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
                 this.stopMotor()
                 task = Tasks.Stop
                 isBusy = false
-                Thread.currentThread().interrupt()
             }
             Tasks.Stop -> this.stopMotor()            
         }
+        return;
     }
 }

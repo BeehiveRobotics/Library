@@ -317,7 +317,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
         rearRight.power = rr
     }
 
-    protected fun setRawPowers(fl: Double, fr: Double, rl: Double, rr: Double) {
+    fun setRawPowers(fl: Double, fr: Double, rl: Double, rr: Double) {
         frontLeft.motor.power = fl
         frontRight.motor.power = fr
         rearLeft.motor.power = rl
@@ -390,6 +390,7 @@ abstract class DriveMotorSystem(protected val opMode: BROpMode, protected var ge
             Tasks.Stop -> stopMotors()
         }
         isBusy = false
+        return;
     }
 
     override fun toString(): String =

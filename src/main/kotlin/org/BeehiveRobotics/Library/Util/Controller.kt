@@ -14,7 +14,7 @@ class Controller(private val gamepad: Gamepad) {
     private var dpadLeftPrev = false
     private var dpadRightPrev = false
 
-    private var DEBOUNCING_NUMBER_OF_SAMPLES = 20
+    private var DEBOUNCING_NUMBER_OF_SAMPLES = 10
     private var aCountOn = 0
     private var bCountOn = 0
     private var xCountOn = 0
