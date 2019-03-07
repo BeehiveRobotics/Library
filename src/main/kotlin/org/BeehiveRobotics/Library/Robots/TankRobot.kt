@@ -8,7 +8,7 @@ class TankRobot(private val opMode: BROpMode, private val gearedType: DriveMotor
     lateinit var drive: TankDrive
     override fun init() {
         drive = TankDrive(opMode, gearedType)
-        drive.init()
+        drive.onInit()
     }
     override fun waitUntilNotBusy() {
         while(opMode.opModeIsActive() && drive.isBusy) {}

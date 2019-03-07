@@ -5,9 +5,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.util.Range
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.BeehiveRobotics.Library.Util.BROpMode
-import org.BeehiveRobotics.Library.Systems.RobotSystem
+import org.BeehiveRobotics.Library.Systems.SubSystem
 
-class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode), Runnable {
+class MotorOld(private val opMode: BROpMode, val name: String): SubSystem(opMode), Runnable {
     val motor: DcMotor = opMode.hardwareMap.get(DcMotor::class.java, name)
     var RAMPING_COEFFICIENT = 0.8
     var MIN_SPEED = 0.2
@@ -138,7 +138,7 @@ class Motor(private val opMode: BROpMode, val name: String): RobotSystem(opMode)
         resetEncoder()
     }
 
-    fun resetEncoder(): Motor {
+    fun resetEncoder(): MotorOld {
         val initialBehavior = this.runMode
         this.runMode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
         this.runMode = initialBehavior
